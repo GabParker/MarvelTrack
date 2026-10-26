@@ -1,77 +1,103 @@
-import { useMemo, useState } from 'react'
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  BrowserRouter,
+  NavLink,
+  Route,
+  Routes,
+} from 'react-router-dom'
+import type { Character } from './types/Character'
+import type { Team } from './types/Team'
+import { getMarvelCharacters } from './utils/charactersApi'
+import { teams } from './data/teams'
+import CharacterCard from './components/CharacterCard'
+import TeamCard from './components/TeamCard'
+import TeamDetails from './components/TeamDetails/TeamDetails'
+import ProtectedRoute from './components/ProtectedRoute'
+import { useAuth, AuthProvider } from './contexts/AuthContext'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import ProfilePage from './pages/ProfilePage'
 import './App.css'
 
-type Character = {
-  id: number
-  name: string
-  universe: string
-  description: string
-  initials: string
-  alignment: 'hero' | 'villain'
-  style: string
+function ScrollToTopButton() {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    function handleScroll() {
+      setIsVisible(window.scrollY > 300)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
+  if (!isVisible) {
+    return null
+  }
+
+  return (
+    <button
+      className="back-to-top"
+      type="button"
+      onClick={scrollToTop}
+      aria-label="Volver al inicio de la página"
+    >
+      <span aria-hidden="true">↑</span>
+      Volver arriba
+    </button>
+  )
 }
 
-const characters: Character[] = [
-  {
-    id: 1,
-    name: 'Iron Man',
-    universe: 'AVENGERS',
-    description: 'Genio, inventor y héroe con una armadura extraordinaria.',
-    initials: 'IM',
-    alignment: 'hero',
-    style: 'character-card__art--ironman',
-  },
-  {
-    id: 2,
-    name: 'Spider-Man',
-    universe: 'NEW YORK',
-    description: 'Un héroe con grandes poderes y una gran responsabilidad.',
-    initials: 'SM',
-    alignment: 'hero',
-    style: 'character-card__art--spiderman',
-  },
-  {
-    id: 3,
-    name: 'Doctor Strange',
-    universe: 'MYSTIC ARTS',
-    description: 'Protector de la Tierra frente a amenazas místicas.',
-    initials: 'DS',
-    alignment: 'hero',
-    style: 'character-card__art--strange',
-  },
-  {
-    id: 4,
-    name: 'Thanos',
-    universe: 'THE INFINITY SAGA',
-    description: 'Un poderoso titán decidido a imponer su visión del equilibrio.',
-    initials: 'TH',
-    alignment: 'villain',
-    style: 'character-card__art--thanos',
-  },
-  {
-    id: 5,
-    name: 'Loki',
-    universe: 'ASGARD',
-    description: 'El astuto dios de las travesuras, lleno de secretos.',
-    initials: 'LO',
-    alignment: 'villain',
-    style: 'character-card__art--loki',
-  },
-  {
-    id: 6,
-    name: 'Doctor Doom',
-    universe: 'LATVERIA',
-    description: 'Un brillante científico y gobernante con una armadura imponente.',
-    initials: 'DD',
-    alignment: 'villain',
-    style: 'character-card__art--doom',
-  },
-]
-
 function HomePage() {
+  const [characters, setCharacters] = useState<Character[]>([])
   const [search, setSearch] = useState('')
   const [alignment, setAlignment] = useState<'all' | 'hero' | 'villain'>('all')
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadCharacters() {
+      try {
+        setIsLoading(true)
+        setError('')
+
+        const data = await getMarvelCharacters()
+
+        if (isActive) {
+          setCharacters(data)
+        }
+      } catch {
+        if (isActive) {
+          setError(
+            'No pudimos cargar los personajes. Comprueba tu conexión e inténtalo de nuevo.',
+          )
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadCharacters()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   const filteredCharacters = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -81,47 +107,54 @@ function HomePage() {
         character.name.toLowerCase().includes(normalizedSearch) ||
         character.universe.toLowerCase().includes(normalizedSearch)
 
+      const normalizedAlignment = String(
+        character.alignment ?? '',
+      ).toLowerCase()
+
       const matchesAlignment =
-        alignment === 'all' || character.alignment === alignment
+        alignment === 'all' ||
+        (alignment === 'hero' &&
+          (normalizedAlignment === 'hero' ||
+            normalizedAlignment === 'good')) ||
+        (alignment === 'villain' &&
+          (normalizedAlignment === 'villain' ||
+            normalizedAlignment === 'bad' ||
+            normalizedAlignment === 'evil'))
 
       return matchesSearch && matchesAlignment
     })
-  }, [search, alignment])
+  }, [characters, search, alignment])
 
   return (
     <main className="page">
       <section className="hero">
-        <p className="eyebrow">TU UNIVERSO MARVEL</p>
-        <h1>Descubre tu próximo héroe favorito.</h1>
+        <p className="eyebrow">EXPLORA EL MULTIVERSO</p>
+        <h1>Descubre tu próximo héroe favorito</h1>
         <p className="hero__description">
-          Explora personajes, descubre sus historias y construye tu propia
-          colección del universo Marvel.
+          Explora personajes, descubre sus universos y conoce a las figuras que
+          hacen extraordinario el mundo de los cómics.
         </p>
-        <a className="primary-button" href="#characters">
-          Explorar personajes
-        </a>
       </section>
 
-      <section className="characters" id="characters">
+      <section className="characters-section">
         <div className="section-heading">
           <div>
             <p className="eyebrow">ARCHIVO DE PERSONAJES</p>
-            <h2>Explora el universo</h2>
+            <h2>Explorar personajes</h2>
           </div>
           <span className="characters__count">
-            {filteredCharacters.length}{' '}
-            {filteredCharacters.length === 1 ? 'personaje' : 'personajes'}
+            {isLoading ? 'Cargando…' : `${filteredCharacters.length} personajes`}
           </span>
         </div>
 
-        <div className="character-filters">
-          <label className="character-search">
-            <span>Buscar personajes</span>
+        <div className="characters__controls">
+          <label className="search-field">
+            <span className="visually-hidden">Buscar personajes</span>
             <input
               type="search"
+              placeholder="Buscar por nombre o universo…"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Ej. Spider-Man, Asgard..."
             />
           </label>
 
@@ -153,51 +186,62 @@ function HomePage() {
           </div>
         </div>
 
-        {filteredCharacters.length > 0 ? (
-          <div className="character-grid">
-            {filteredCharacters.map((character) => (
-              <article className="character-card" key={character.id}>
-                <div className={`character-card__art ${character.style}`}>
-                  <span className="character-card__symbol">
-                    {character.initials}
-                  </span>
-                </div>
-                <div className="character-card__content">
-                  <p className="character-card__universe">
-                    {character.universe}
-                  </p>
-                  <h3>{character.name}</h3>
-                  <p>{character.description}</p>
-                  <span
-                    className={`character-alignment character-alignment--${character.alignment}`}
-                  >
-                    {character.alignment === 'hero' ? 'Héroe' : 'Villano'}
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <h3>No encontramos personajes</h3>
-            <p>Prueba con otro nombre o cambia el filtro seleccionado.</p>
-            <button
-              className="filter-button"
-              type="button"
-              onClick={() => {
-                setSearch('')
-                setAlignment('all')
-              }}
-            >
-              Limpiar búsqueda
-            </button>
-          </div>
+        {isLoading && (
+          <p className="status-message" role="status">
+            Cargando personajes del universo Marvel…
+          </p>
         )}
 
-        <p className="demo-notice">
-          Catálogo de muestra para desarrollo. Conectaremos los personajes a
-          una API en una siguiente etapa.
+        {!isLoading && error && (
+          <p className="status-message auth-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        {!isLoading && !error && filteredCharacters.length === 0 && (
+          <p className="status-message">
+            No encontramos personajes con esos criterios. Prueba otra búsqueda.
+          </p>
+        )}
+
+        {!isLoading && !error && filteredCharacters.length > 0 && (
+          <div className="character-grid">
+            {filteredCharacters.map((character) => (
+              <CharacterCard key={character.id} character={character} />
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
+  )
+}
+
+function TeamsPage() {
+  return (
+    <main className="page">
+      <section className="hero">
+        <p className="eyebrow">UNIDOS SON MÁS FUERTES</p>
+        <h1>Equipos del multiverso</h1>
+        <p className="hero__description">
+          Descubre a los grupos que unen fuerzas para enfrentar amenazas
+          extraordinarias a través del universo.
         </p>
+      </section>
+
+      <section className="teams-section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">ARCHIVO DE EQUIPOS</p>
+            <h2>Conoce a los equipos</h2>
+          </div>
+          <span className="characters__count">{teams.length} equipos</span>
+        </div>
+
+        <div className="teams-grid">
+          {teams.map((team: Team) => (
+            <TeamCard key={team.id} team={team} />
+          ))}
+        </div>
       </section>
     </main>
   )
@@ -224,62 +268,125 @@ function AboutPage() {
   )
 }
 
+function SiteNavigation() {
+  const { user, isLoading, logout } = useAuth()
+
+  async function handleLogout() {
+    try {
+      await logout()
+    } catch (error) {
+      console.error('No se pudo cerrar la sesión:', error)
+    }
+  }
+
+  return (
+    <nav className="site-nav" aria-label="Navegación principal">
+      <NavLink to="/" end className={({ isActive }) =>
+        isActive ? 'site-nav__link is-active' : 'site-nav__link'
+      }>
+        Explorar
+      </NavLink>
+      <NavLink to="/teams" className={({ isActive }) =>
+        isActive ? 'site-nav__link is-active' : 'site-nav__link'
+      }>
+        Equipos
+      </NavLink>
+      <NavLink to="/about" className={({ isActive }) =>
+        isActive ? 'site-nav__link is-active' : 'site-nav__link'
+      }>
+        Sobre el autor
+      </NavLink>
+
+      {!isLoading && user ? (
+        <>
+          <NavLink to="/profile" className={({ isActive }) =>
+            isActive ? 'site-nav__link is-active' : 'site-nav__link'
+          }>
+            Mi perfil
+          </NavLink>
+          <button
+            className="site-nav__link site-nav__button"
+            type="button"
+            onClick={handleLogout}
+          >
+            Cerrar sesión
+          </button>
+        </>
+      ) : (
+        <>
+          <NavLink to="/login" className={({ isActive }) =>
+            isActive ? 'site-nav__link is-active' : 'site-nav__link'
+          }>
+            Iniciar sesión
+          </NavLink>
+          <NavLink to="/register" className={({ isActive }) =>
+            isActive ? 'site-nav__link is-active' : 'site-nav__link'
+          }>
+            Registrarse
+          </NavLink>
+        </>
+      )}
+    </nav>
+  )
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/teams" element={<TeamsPage />} />
+      <Route path="/teams/:teamId" element={<TeamDetails />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/profile" element={<ProfilePage />} />
+      </Route>
+
+      <Route
+        path="*"
+        element={
+          <main className="page not-found">
+            <h1>Universo no encontrado</h1>
+            <p>La página que buscas no existe.</p>
+            <NavLink className="primary-button" to="/">
+              Volver al inicio
+            </NavLink>
+          </main>
+        }
+      />
+    </Routes>
+  )
+}
+
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app-shell">
-        <header className="site-header">
-          <NavLink className="brand" to="/" aria-label="MarvelTrack, inicio">
-            <span className="brand__mark">M</span>
-            <span>
-              MARVEL<span className="brand__accent">TRACK</span>
-            </span>
-          </NavLink>
-
-          <nav className="site-nav" aria-label="Navegación principal">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                isActive ? 'site-nav__link is-active' : 'site-nav__link'
-              }
-            >
-              Explorar
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="app-shell">
+          <header className="site-header">
+            <NavLink className="brand" to="/" aria-label="MarvelTrack, inicio">
+              <span className="brand__mark">M</span>
+              <span>
+                MARVEL<span className="brand__accent">TRACK</span>
+              </span>
             </NavLink>
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                isActive ? 'site-nav__link is-active' : 'site-nav__link'
-              }
-            >
-              Sobre el autor
-            </NavLink>
-          </nav>
-        </header>
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route
-            path="*"
-            element={
-              <main className="page not-found">
-                <h1>Universo no encontrado</h1>
-                <p>La página que buscas no existe.</p>
-                <NavLink className="primary-button" to="/">
-                  Volver al inicio
-                </NavLink>
-              </main>
-            }
-          />
-        </Routes>
+            <SiteNavigation />
+          </header>
 
-        <footer className="site-footer">
-          <p>MARVELTRACK</p>
-          <p>Proyecto independiente de práctica. No afiliado a Marvel.</p>
-        </footer>
-      </div>
-    </BrowserRouter>
+          <AppRoutes />
+
+          <footer className="site-footer">
+            <p>MARVELTRACK</p>
+            <p>Proyecto independiente de práctica. No afiliado a Marvel.</p>
+          </footer>
+
+          <ScrollToTopButton />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
