@@ -65,6 +65,8 @@ function HomePage() {
   const [alignment, setAlignment] = useState<'all' | 'hero' | 'villain'>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedCharacter, setSelectedCharacter] =
+    useState<Character | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -98,6 +100,24 @@ function HomePage() {
       isActive = false
     }
   }, [])
+
+  useEffect(() => {
+    if (!selectedCharacter) {
+      return
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSelectedCharacter(null)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedCharacter])
 
   const filteredCharacters = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -142,6 +162,7 @@ function HomePage() {
             <p className="eyebrow">ARCHIVO DE PERSONAJES</p>
             <h2>Explorar personajes</h2>
           </div>
+
           <span className="characters__count">
             {isLoading ? 'Cargando…' : `${filteredCharacters.length} personajes`}
           </span>
@@ -161,23 +182,37 @@ function HomePage() {
           <div className="filter-buttons" aria-label="Filtrar personajes">
             <button
               type="button"
-              className={alignment === 'all' ? 'filter-button is-active' : 'filter-button'}
+              className={
+                alignment === 'all'
+                  ? 'filter-button is-active'
+                  : 'filter-button'
+              }
               onClick={() => setAlignment('all')}
               aria-pressed={alignment === 'all'}
             >
               Todos
             </button>
+
             <button
               type="button"
-              className={alignment === 'hero' ? 'filter-button is-active' : 'filter-button'}
+              className={
+                alignment === 'hero'
+                  ? 'filter-button is-active'
+                  : 'filter-button'
+              }
               onClick={() => setAlignment('hero')}
               aria-pressed={alignment === 'hero'}
             >
               Héroes
             </button>
+
             <button
               type="button"
-              className={alignment === 'villain' ? 'filter-button is-active' : 'filter-button'}
+              className={
+                alignment === 'villain'
+                  ? 'filter-button is-active'
+                  : 'filter-button'
+              }
               onClick={() => setAlignment('villain')}
               aria-pressed={alignment === 'villain'}
             >
@@ -207,11 +242,63 @@ function HomePage() {
         {!isLoading && !error && filteredCharacters.length > 0 && (
           <div className="character-grid">
             {filteredCharacters.map((character) => (
-              <CharacterCard key={character.id} character={character} />
+              <CharacterCard
+                key={character.id}
+                character={character}
+                onOpen={setSelectedCharacter}
+              />
             ))}
           </div>
         )}
       </section>
+
+      {selectedCharacter && (
+        <div
+          className="character-modal"
+          onClick={() => setSelectedCharacter(null)}
+        >
+          <section
+            className="character-modal__content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="character-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="character-modal__close"
+              onClick={() => setSelectedCharacter(null)}
+              aria-label="Cerrar detalles"
+            >
+              ×
+            </button>
+
+            <img
+              className="character-modal__image"
+              src={selectedCharacter.image}
+              alt={`Imagen de ${selectedCharacter.name}`}
+            />
+
+            <div className="character-modal__details">
+              <p className="eyebrow">{selectedCharacter.universe}</p>
+
+              <h2 id="character-modal-title">
+                {selectedCharacter.name}
+              </h2>
+
+              <p>{selectedCharacter.description}</p>
+
+              <span
+                className={`character-alignment character-alignment--${selectedCharacter.alignment}`}
+              >
+                {selectedCharacter.alignment === 'villain'
+                  ? 'Villano'
+                  : 'Héroe'}
+              </span>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }
@@ -234,7 +321,10 @@ function TeamsPage() {
             <p className="eyebrow">ARCHIVO DE EQUIPOS</p>
             <h2>Conoce a los equipos</h2>
           </div>
-          <span className="characters__count">{teams.length} equipos</span>
+
+          <span className="characters__count">
+            {teams.length} equipos
+          </span>
         </div>
 
         <div className="teams-grid">
@@ -252,15 +342,18 @@ function AboutPage() {
     <main className="page about-page">
       <p className="eyebrow">DETRÁS DEL PROYECTO</p>
       <h1>Sobre el autor</h1>
+
       <p>
         ¡Hola! Soy el desarrollador de MarvelTrack. Este proyecto forma parte
         de mi recorrido de aprendizaje en desarrollo web y combina mi interés
         por la tecnología con el universo de los cómics.
       </p>
+
       <p>
         MarvelTrack busca ofrecer un espacio para explorar personajes,
         organizar favoritos y descubrir historias del multiverso.
       </p>
+
       <NavLink className="primary-button" to="/">
         Volver al catálogo
       </NavLink>
@@ -281,29 +374,45 @@ function SiteNavigation() {
 
   return (
     <nav className="site-nav" aria-label="Navegación principal">
-      <NavLink to="/" end className={({ isActive }) =>
-        isActive ? 'site-nav__link is-active' : 'site-nav__link'
-      }>
+      <NavLink
+        to="/"
+        end
+        className={({ isActive }) =>
+          isActive ? 'site-nav__link is-active' : 'site-nav__link'
+        }
+      >
         Explorar
       </NavLink>
-      <NavLink to="/teams" className={({ isActive }) =>
-        isActive ? 'site-nav__link is-active' : 'site-nav__link'
-      }>
+
+      <NavLink
+        to="/teams"
+        className={({ isActive }) =>
+          isActive ? 'site-nav__link is-active' : 'site-nav__link'
+        }
+      >
         Equipos
       </NavLink>
-      <NavLink to="/about" className={({ isActive }) =>
-        isActive ? 'site-nav__link is-active' : 'site-nav__link'
-      }>
+
+      <NavLink
+        to="/about"
+        className={({ isActive }) =>
+          isActive ? 'site-nav__link is-active' : 'site-nav__link'
+        }
+      >
         Sobre el autor
       </NavLink>
 
       {!isLoading && user ? (
         <>
-          <NavLink to="/profile" className={({ isActive }) =>
-            isActive ? 'site-nav__link is-active' : 'site-nav__link'
-          }>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              isActive ? 'site-nav__link is-active' : 'site-nav__link'
+            }
+          >
             Mi perfil
           </NavLink>
+
           <button
             className="site-nav__link site-nav__button"
             type="button"
@@ -314,14 +423,21 @@ function SiteNavigation() {
         </>
       ) : (
         <>
-          <NavLink to="/login" className={({ isActive }) =>
-            isActive ? 'site-nav__link is-active' : 'site-nav__link'
-          }>
+          <NavLink
+            to="/login"
+            className={({ isActive }) =>
+              isActive ? 'site-nav__link is-active' : 'site-nav__link'
+            }
+          >
             Iniciar sesión
           </NavLink>
-          <NavLink to="/register" className={({ isActive }) =>
-            isActive ? 'site-nav__link is-active' : 'site-nav__link'
-          }>
+
+          <NavLink
+            to="/register"
+            className={({ isActive }) =>
+              isActive ? 'site-nav__link is-active' : 'site-nav__link'
+            }
+          >
             Registrarse
           </NavLink>
         </>
@@ -366,7 +482,11 @@ function App() {
       <BrowserRouter>
         <div className="app-shell">
           <header className="site-header">
-            <NavLink className="brand" to="/" aria-label="MarvelTrack, inicio">
+            <NavLink
+              className="brand"
+              to="/"
+              aria-label="MarvelTrack, inicio"
+            >
               <span className="brand__mark">M</span>
               <span>
                 MARVEL<span className="brand__accent">TRACK</span>

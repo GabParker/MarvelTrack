@@ -1,4 +1,3 @@
-
 import type { Character } from '../types/Character'
 
 type CharacterCardProps = {
