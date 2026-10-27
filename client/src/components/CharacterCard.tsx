@@ -18,7 +18,10 @@ export default function CharacterCard({
       <button
         type="button"
         className="character-card__open"
-        onClick={() => onOpen?.(character)}
+        onClick={() => {
+          console.log('Tarjeta seleccionada:', character.name)
+          onOpen?.(character)
+        }}
         aria-label={`Ver detalles de ${character.name}`}
       >
         <div
