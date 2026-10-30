@@ -5,19 +5,27 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
+
 import type { Character } from './types/Character'
 import type { Team } from './types/Team'
+
 import { getMarvelCharacters } from './utils/charactersApi'
 import { teams } from './data/teams'
+
 import CharacterCard from './components/CharacterCard'
 import TeamCard from './components/TeamCard'
 import TeamDetails from './components/TeamDetails/TeamDetails'
 import ProtectedRoute from './components/ProtectedRoute'
+
 import { useAuth, AuthProvider } from './contexts/AuthContext'
+
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
+
 import './App.css'
+
+const CHARACTERS_PER_PAGE = 24
 
 function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false)
@@ -63,6 +71,7 @@ function HomePage() {
   const [characters, setCharacters] = useState<Character[]>([])
   const [search, setSearch] = useState('')
   const [alignment, setAlignment] = useState<'all' | 'hero' | 'villain'>('all')
+  const [visibleCount, setVisibleCount] = useState(CHARACTERS_PER_PAGE)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedCharacter, setSelectedCharacter] =
@@ -119,6 +128,10 @@ function HomePage() {
     }
   }, [selectedCharacter])
 
+  useEffect(() => {
+    setVisibleCount(CHARACTERS_PER_PAGE)
+  }, [search, alignment])
+
   const filteredCharacters = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
 
@@ -145,6 +158,12 @@ function HomePage() {
     })
   }, [characters, search, alignment])
 
+  const visibleCharacters = filteredCharacters.slice(0, visibleCount)
+
+  function handleLoadMore() {
+    setVisibleCount((currentCount) => currentCount + CHARACTERS_PER_PAGE)
+  }
+
   return (
     <main className="page">
       <section className="hero">
@@ -164,7 +183,9 @@ function HomePage() {
           </div>
 
           <span className="characters__count">
-            {isLoading ? 'Cargando…' : `${filteredCharacters.length} personajes`}
+            {isLoading
+              ? 'Cargando…'
+              : `${filteredCharacters.length} personajes`}
           </span>
         </div>
 
@@ -240,15 +261,29 @@ function HomePage() {
         )}
 
         {!isLoading && !error && filteredCharacters.length > 0 && (
-          <div className="character-grid">
-            {filteredCharacters.map((character) => (
-              <CharacterCard
-                key={character.id}
-                character={character}
-                onOpen={setSelectedCharacter}
-              />
-            ))}
-          </div>
+          <>
+            <div className="character-grid">
+              {visibleCharacters.map((character) => (
+                <CharacterCard
+                  key={character.id}
+                  character={character}
+                  onOpen={setSelectedCharacter}
+                />
+              ))}
+            </div>
+
+            {visibleCount < filteredCharacters.length && (
+              <div className="load-more-container">
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={handleLoadMore}
+                >
+                  Cargar más personajes
+                </button>
+              </div>
+            )}
+          </>
         )}
       </section>
 
