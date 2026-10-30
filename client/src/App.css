@@ -1211,3 +1211,14 @@
     max-height: 300px;
   }
 }
+
+/* ==========================================
+   BOTÓN CARGAR MÁS PERSONAJES
+========================================== */
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 32px 0 12px;
+}

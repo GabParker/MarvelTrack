@@ -1,11 +1,10 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useState,
 } from 'react'
 import type { ReactNode } from 'react'
+
 import {
   getCurrentUser,
   signin as apiSignin,
@@ -13,35 +12,16 @@ import {
   signup as apiSignup,
   updateCurrentUser as apiUpdateCurrentUser,
 } from '../utils/authApi'
-import type { AuthUser } from '../utils/authApi'
 
-interface AuthContextValue {
-  user: AuthUser | null
-  isLoading: boolean
-  isAuthenticated: boolean
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    avatar?: string,
-  ) => Promise<void>
-  login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
-  refreshUser: () => Promise<void>
-  updateProfile: (updates: {
-    name?: string
-    avatar?: string
-  }) => Promise<void>
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+import { AuthContext } from './auth-context'
+import type { AuthContextValue } from './auth-context'
 
 interface AuthProviderProps {
   children: ReactNode
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const [user, setUser] = useState<AuthContextValue['user']>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const refreshUser = useCallback(async () => {
@@ -89,11 +69,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       avatar = '',
     ) => {
       await apiSignup(name, email, password, avatar)
-
-      // Iniciar sesión para que el servidor establezca la cookie.
       await apiSignin(email, password)
 
-      // Recuperar el perfil después de establecer la sesión.
       const currentUser = await getCurrentUser()
       setUser(currentUser)
     },
@@ -138,14 +115,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
       {children}
     </AuthContext.Provider>
   )
-}
-
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext)
-
-  if (!context) {
-    throw new Error('useAuth debe utilizarse dentro de AuthProvider.')
-  }
-
-  return context
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/useAuth'
 
 function ProfilePage() {
   const { user, logout, updateProfile } = useAuth()
@@ -15,13 +15,6 @@ function ProfilePage() {
   const [avatarError, setAvatarError] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-
-  useEffect(() => {
-    if (user) {
-      setName(user.name)
-      setAvatar(user.avatar)
-    }
-  }, [user])
 
   function validateName(value: string): string {
     const normalizedName = value.trim()
