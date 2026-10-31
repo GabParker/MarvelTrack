@@ -95,17 +95,21 @@ function LoginPage() {
     <main className="page auth-page">
       <section className="auth-card">
         <p className="eyebrow">ACCESO AL MULTIVERSO</p>
+
         <h1>Iniciar sesión</h1>
+
         <p>
           Entra a MarvelTrack y continúa explorando tus personajes favoritos.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <label htmlFor="login-email">Correo electrónico</label>
+
           <input
             id="login-email"
             name="email"
             type="email"
+            placeholder="tu@correo.com"
             autoComplete="email"
             value={email}
             onChange={(event) => handleEmailChange(event.target.value)}
@@ -113,6 +117,7 @@ function LoginPage() {
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? 'login-email-error' : undefined}
           />
+
           {errors.email && (
             <p
               className="auth-field-error"
@@ -124,10 +129,12 @@ function LoginPage() {
           )}
 
           <label htmlFor="login-password">Contraseña</label>
+
           <input
             id="login-password"
             name="password"
             type="password"
+            placeholder="Introduce tu contraseña"
             autoComplete="current-password"
             value={password}
             onChange={(event) => handlePasswordChange(event.target.value)}
@@ -137,6 +144,7 @@ function LoginPage() {
               errors.password ? 'login-password-error' : undefined
             }
           />
+
           {errors.password && (
             <p
               className="auth-field-error"
@@ -163,7 +171,8 @@ function LoginPage() {
         </form>
 
         <p className="auth-switch">
-          ¿Todavía no tienes cuenta? <Link to="/register">Regístrate</Link>
+          ¿Todavía no tienes cuenta?{' '}
+          <Link to="/register">Regístrate</Link>
         </p>
       </section>
     </main>

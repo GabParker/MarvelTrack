@@ -209,6 +209,7 @@ function ProfilePage() {
               name="name"
               type="text"
               autoComplete="name"
+              placeholder="Tu nombre"
               value={name}
               onChange={(event) => handleNameChange(event.target.value)}
               minLength={2}

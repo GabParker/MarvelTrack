@@ -88,7 +88,9 @@ function RegisterPage() {
       ...previous,
       password: validatePassword(value),
       confirmPassword: confirmPassword
-        ? validateConfirmPassword(confirmPassword)
+        ? value === confirmPassword
+          ? ''
+          : 'Las contraseñas no coinciden.'
         : previous.confirmPassword,
     }))
     setSubmitError('')
@@ -140,17 +142,21 @@ function RegisterPage() {
     <main className="page auth-page">
       <section className="auth-card">
         <p className="eyebrow">ÚNETE AL MULTIVERSO</p>
+
         <h1>Crear cuenta</h1>
+
         <p>
           Regístrate para comenzar tu experiencia en MarvelTrack.
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <label htmlFor="register-name">Nombre</label>
+
           <input
             id="register-name"
             name="name"
             type="text"
+            placeholder="Tu nombre"
             autoComplete="name"
             minLength={2}
             maxLength={40}
@@ -160,6 +166,7 @@ function RegisterPage() {
             aria-invalid={Boolean(errors.name)}
             aria-describedby={errors.name ? 'register-name-error' : undefined}
           />
+
           {errors.name && (
             <p className="auth-field-error" id="register-name-error" role="alert">
               {errors.name}
@@ -167,10 +174,12 @@ function RegisterPage() {
           )}
 
           <label htmlFor="register-email">Correo electrónico</label>
+
           <input
             id="register-email"
             name="email"
             type="email"
+            placeholder="tu@correo.com"
             autoComplete="email"
             value={email}
             onChange={(event) => handleEmailChange(event.target.value)}
@@ -178,6 +187,7 @@ function RegisterPage() {
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? 'register-email-error' : undefined}
           />
+
           {errors.email && (
             <p className="auth-field-error" id="register-email-error" role="alert">
               {errors.email}
@@ -185,10 +195,12 @@ function RegisterPage() {
           )}
 
           <label htmlFor="register-password">Contraseña</label>
+
           <input
             id="register-password"
             name="password"
             type="password"
+            placeholder="Mínimo 8 caracteres"
             autoComplete="new-password"
             minLength={8}
             value={password}
@@ -199,6 +211,7 @@ function RegisterPage() {
               errors.password ? 'register-password-error' : undefined
             }
           />
+
           {errors.password && (
             <p
               className="auth-field-error"
@@ -212,10 +225,12 @@ function RegisterPage() {
           <label htmlFor="register-confirm-password">
             Confirmar contraseña
           </label>
+
           <input
             id="register-confirm-password"
             name="confirmPassword"
             type="password"
+            placeholder="Repite tu contraseña"
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(event) =>
@@ -229,6 +244,7 @@ function RegisterPage() {
                 : undefined
             }
           />
+
           {errors.confirmPassword && (
             <p
               className="auth-field-error"

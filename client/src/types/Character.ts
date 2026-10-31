@@ -4,5 +4,5 @@ export type Character = {
   universe: string
   description: string
   image: string
-  alignment: 'hero' | 'villain'
+  alignment: 'hero' | 'villain' | 'neutral'
 }

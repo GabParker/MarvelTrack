@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Character } from '../types/Character'
 import { getMarvelCharacters } from '../utils/charactersApi'
+import { CHARACTERS_PER_PAGE } from '../config/constants'
 import CharacterCard from '../components/CharacterCard'
 
-const CHARACTERS_PER_PAGE = 24
+type AlignmentFilter = 'all' | 'hero' | 'villain' | 'neutral'
 
 function HomePage() {
   const [characters, setCharacters] = useState<Character[]>([])
   const [search, setSearch] = useState('')
-  const [alignment, setAlignment] = useState<'all' | 'hero' | 'villain'>('all')
+  const [alignment, setAlignment] = useState<AlignmentFilter>('all')
   const [visibleCount, setVisibleCount] = useState(CHARACTERS_PER_PAGE)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -49,9 +50,7 @@ function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (!selectedCharacter) {
-      return
-    }
+    if (!selectedCharacter) return
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -74,37 +73,36 @@ function HomePage() {
         character.name.toLowerCase().includes(normalizedSearch) ||
         character.universe.toLowerCase().includes(normalizedSearch)
 
-      const normalizedAlignment = String(
-        character.alignment ?? '',
-      ).toLowerCase()
-
       const matchesAlignment =
-        alignment === 'all' ||
-        (alignment === 'hero' &&
-          (normalizedAlignment === 'hero' ||
-            normalizedAlignment === 'good')) ||
-        (alignment === 'villain' &&
-          (normalizedAlignment === 'villain' ||
-            normalizedAlignment === 'bad' ||
-            normalizedAlignment === 'evil'))
+        alignment === 'all' || character.alignment === alignment
 
       return matchesSearch && matchesAlignment
     })
   }, [characters, search, alignment])
 
-  const visibleCharacters = filteredCharacters.slice(
-    0,
-    search || alignment !== 'all' ? CHARACTERS_PER_PAGE : visibleCount,
-  )
+  const visibleCharacters = filteredCharacters.slice(0, visibleCount)
 
   function handleLoadMore() {
     setVisibleCount((currentCount) => currentCount + CHARACTERS_PER_PAGE)
   }
 
-  const hasMoreCharacters =
-    !search.trim() &&
-    alignment === 'all' &&
-    visibleCount < filteredCharacters.length
+  function handleSearchChange(value: string) {
+    setSearch(value)
+    setVisibleCount(CHARACTERS_PER_PAGE)
+  }
+
+  function handleAlignmentChange(value: AlignmentFilter) {
+    setAlignment(value)
+    setVisibleCount(CHARACTERS_PER_PAGE)
+  }
+
+  const hasMoreCharacters = visibleCount < filteredCharacters.length
+
+  const alignmentLabels: Record<Character['alignment'], string> = {
+    hero: 'Héroe',
+    villain: 'Villano',
+    neutral: 'Neutral',
+  }
 
   return (
     <main className="page">
@@ -138,10 +136,7 @@ function HomePage() {
               type="search"
               placeholder="Buscar por nombre o universo…"
               value={search}
-              onChange={(event) => {
-                setSearch(event.target.value)
-                setVisibleCount(CHARACTERS_PER_PAGE)
-              }}
+              onChange={(event) => handleSearchChange(event.target.value)}
             />
           </label>
 
@@ -153,10 +148,7 @@ function HomePage() {
                   ? 'filter-button is-active'
                   : 'filter-button'
               }
-              onClick={() => {
-                setAlignment('all')
-                setVisibleCount(CHARACTERS_PER_PAGE)
-              }}
+              onClick={() => handleAlignmentChange('all')}
               aria-pressed={alignment === 'all'}
             >
               Todos
@@ -169,10 +161,7 @@ function HomePage() {
                   ? 'filter-button is-active'
                   : 'filter-button'
               }
-              onClick={() => {
-                setAlignment('hero')
-                setVisibleCount(CHARACTERS_PER_PAGE)
-              }}
+              onClick={() => handleAlignmentChange('hero')}
               aria-pressed={alignment === 'hero'}
             >
               Héroes
@@ -185,13 +174,23 @@ function HomePage() {
                   ? 'filter-button is-active'
                   : 'filter-button'
               }
-              onClick={() => {
-                setAlignment('villain')
-                setVisibleCount(CHARACTERS_PER_PAGE)
-              }}
+              onClick={() => handleAlignmentChange('villain')}
               aria-pressed={alignment === 'villain'}
             >
               Villanos
+            </button>
+
+            <button
+              type="button"
+              className={
+                alignment === 'neutral'
+                  ? 'filter-button is-active'
+                  : 'filter-button'
+              }
+              onClick={() => handleAlignmentChange('neutral')}
+              aria-pressed={alignment === 'neutral'}
+            >
+              Neutrales
             </button>
           </div>
         </div>
@@ -280,9 +279,7 @@ function HomePage() {
               <span
                 className={`character-alignment character-alignment--${selectedCharacter.alignment}`}
               >
-                {selectedCharacter.alignment === 'villain'
-                  ? 'Villano'
-                  : 'Héroe'}
+                {alignmentLabels[selectedCharacter.alignment]}
               </span>
             </div>
           </section>

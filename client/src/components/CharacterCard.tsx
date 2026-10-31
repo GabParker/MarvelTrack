@@ -9,18 +9,20 @@ export default function CharacterCard({
   character,
   onOpen,
 }: CharacterCardProps) {
-  const alignmentLabel =
-    character.alignment === 'villain' ? 'Villano' : 'Héroe'
+  const alignmentLabels = {
+    hero: 'Héroe',
+    villain: 'Villano',
+    neutral: 'Neutral',
+  }
+
+  const alignmentLabel = alignmentLabels[character.alignment]
 
   return (
     <article className="character-card">
       <button
         type="button"
         className="character-card__open"
-        onClick={() => {
-          console.log('Tarjeta seleccionada:', character.name)
-          onOpen?.(character)
-        }}
+        onClick={() => onOpen?.(character)}
         aria-label={`Ver detalles de ${character.name}`}
       >
         <div
