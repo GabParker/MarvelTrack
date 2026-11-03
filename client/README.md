@@ -1,75 +1,64 @@
-# React + TypeScript + Vite
+MarvelTrack – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación frontend de MarvelTrack, desarrollada con React, TypeScript y Vite.
 
-Currently, two official plugins are available:
+Este cliente permite explorar personajes del universo Marvel, consultar sus características, descubrir equipos y gestionar el acceso de usuarios.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+✨ Funcionalidades
 
-## React Compiler
+Catálogo de personajes.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Búsqueda y filtros por alineación.
 
-## Expanding the ESLint configuration
+Visualización de detalles de personajes.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Exploración de equipos.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Registro e inicio de sesión.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Gestión del perfil de usuario.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Navegación mediante React Router.
 
-```
+Interfaz responsive.
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+🛠️ Tecnologías
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+React 19
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+TypeScript
 
-```
+Vite
+
+React Router
+
+CSS
+
+🚀 Instalación
+
+Desde la raíz del repositorio, ejecuta:
+
+cd client
+npm install
+
+▶️ Desarrollo
+
+npm run dev
+
+Vite iniciará el servidor de desarrollo. Abre la dirección que aparece en la terminal para visualizar la aplicación.
+
+🗂️ Compilación de producción
+
+npm run build
+
+🔍 Revisión de código
+
+npm run lint
+
+🌐 Aplicación desplegada
+
+https://marveltrack-iota.vercel.app/
+
+👨‍💻 Autor
+
+Gabriel Martínez – GitHub

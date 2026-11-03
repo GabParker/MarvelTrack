@@ -1,45 +1,81 @@
-# MarvelTrack
+MarvelTrack
 
-**MarvelTrack** es una aplicación web inspirada en el universo de Marvel que permite explorar personajes y consultar información sobre ellos. También ofrece funciones de registro e inicio de sesión y una experiencia de navegación centrada en los personajes y los cómics.
+MarvelTrack es una aplicación web inspirada en el universo Marvel que permite explorar personajes, consultar sus características y descubrir los equipos a los que pertenecen.
 
-## 🚀 Aplicación desplegada
+La aplicación ofrece una experiencia intuitiva para descubrir héroes, villanos y personajes neutrales, con funciones de registro e inicio de sesión.
 
-Visita la aplicación aquí:
+🚀 Aplicación desplegada
+
+Visita MarvelTrack:
 
 https://marveltrack-iota.vercel.app/
 
-## ✨ Funcionalidades
+✨ Funcionalidades
 
-- Exploración del catálogo de personajes de Marvel.
-- Visualización de detalles de los personajes.
-- Filtros para explorar el catálogo.
-- Registro de usuarios e inicio de sesión.
-- Interfaz adaptable a diferentes tamaños de pantalla.
+Exploración de un catálogo de personajes.
 
-## 🛠️ Tecnologías utilizadas
+Búsqueda de personajes por nombre o universo.
 
-**Frontend**
-- React
-- TypeScript
-- Vite
-- CSS
+Filtros por alineación: héroes, villanos y neutrales.
 
-**Backend**
-- Node.js
-- Express
+Visualización de información y detalles de cada personaje.
 
-**Herramientas y despliegue**
-- Git y GitHub
-- Vercel para el frontend
-- Render para el backend
+Exploración de equipos del universo Marvel.
 
-## 👨‍💻 Autor
+Registro de usuarios e inicio de sesión.
 
-**Gabriel Martínez**  
+Gestión del perfil de usuario.
+
+Diseño adaptable a diferentes tamaños de pantalla.
+
+🛠️ Tecnologías utilizadas
+
+Frontend
+
+React
+
+TypeScript
+
+Vite
+
+React Router
+
+CSS
+
+Backend
+
+Node.js
+
+Express
+
+Herramientas y despliegue
+
+Git y GitHub
+
+Vercel
+
+Render
+
+Fuente de datos
+
+Superhero API
+
+💻 Instalación y ejecución
+
+Para ejecutar el frontend localmente:
+
+cd client
+npm install
+npm run dev
+
+Vite iniciará el servidor de desarrollo y mostrará la dirección local en la terminal.
+
+👨‍💻 Autor
+
+Gabriel Martínez
+
 GitHub: https://github.com/GabParker
 
-## 📂 Repositorio
-
-Código fuente del proyecto:
+📂 Repositorio
 
 https://github.com/GabParker/MarvelTrack

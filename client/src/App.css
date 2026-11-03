@@ -1,18 +1,15 @@
 ﻿#root {
   min-height: 100vh;
 }
-
 .app-shell {
   position: relative;
   isolation: isolate;
   min-height: 100vh;
-  overflow: clip;
   color: #f5f5f7;
   background:
     radial-gradient(ellipse at 50% 30%, rgb(85 8 17 / 18%), transparent 60%),
     #080809;
 }
-
 .app-shell::before {
   position: absolute;
   z-index: -1;
@@ -71,7 +68,6 @@
     #000 100%
   );
 }
-
 .site-header {
   display: flex;
   align-items: center;
@@ -80,7 +76,6 @@
   padding: 22px max(24px, calc((100% - 1160px) / 2));
   border-bottom: 1px solid #29292f;
 }
-
 .brand {
   display: inline-flex;
   align-items: center;
@@ -91,7 +86,6 @@
   letter-spacing: 1.5px;
   text-decoration: none;
 }
-
 .brand__mark {
   display: grid;
   width: 34px;
@@ -102,17 +96,14 @@
   font-size: 21px;
   font-style: italic;
 }
-
 .brand__accent {
   color: #f04a50;
 }
-
 .site-nav {
   display: flex;
   align-items: center;
   gap: 28px;
 }
-
 .site-nav__link {
   padding: 8px 0;
   color: #b9b9c3;
@@ -120,25 +111,20 @@
   text-decoration: none;
   transition: color 160ms ease;
 }
-
 .site-nav__link:hover,
 .site-nav__link.is-active {
   color: #fff;
 }
-
 .site-nav__link.is-active {
   box-shadow: 0 2px #e62429;
 }
-
 .page {
   width: min(1160px, calc(100% - 48px));
   margin: 0 auto;
 }
-
 .hero {
   padding: 88px 0 76px;
 }
-
 .eyebrow {
   margin: 0 0 16px;
   color: #f04a50;
@@ -146,7 +132,6 @@
   font-weight: 800;
   letter-spacing: 2.5px;
 }
-
 .hero h1,
 .about-page h1 {
   max-width: 760px;
@@ -156,7 +141,6 @@
   letter-spacing: -2.5px;
   line-height: 1.04;
 }
-
 .hero__description {
   max-width: 590px;
   margin: 22px 0 28px;
@@ -164,7 +148,6 @@
   font-size: 17px;
   line-height: 1.8;
 }
-
 .primary-button {
   display: inline-flex;
   min-height: 46px;
@@ -182,23 +165,19 @@
     background 160ms ease,
     transform 160ms ease;
 }
-
 .primary-button:hover {
   transform: translateY(-1px);
   background: #ff343a;
 }
-
 .primary-button:focus-visible,
 .site-nav__link:focus-visible,
 .brand:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 4px;
 }
-
 .characters {
   padding: 10px 0 78px;
 }
-
 .section-heading {
   display: flex;
   align-items: end;
@@ -206,23 +185,19 @@
   gap: 16px;
   margin-bottom: 25px;
 }
-
 .section-heading .eyebrow {
   margin-bottom: 9px;
 }
-
 .section-heading h2 {
   margin: 0;
   font-size: clamp(24px, 4vw, 34px);
   letter-spacing: -0.8px;
 }
-
 .characters__count {
   padding-bottom: 4px;
   color: #a5a5b0;
   font-size: 13px;
 }
-
 .character-filters {
   display: flex;
   align-items: end;
@@ -231,7 +206,6 @@
   gap: 18px;
   margin-bottom: 24px;
 }
-
 .character-search {
   display: grid;
   flex: 1;
@@ -241,7 +215,6 @@
   font-size: 12px;
   font-weight: 700;
 }
-
 .character-search input {
   width: 100%;
   min-height: 44px;
@@ -252,18 +225,15 @@
   background: #19191f;
   color: #fff;
 }
-
 .character-search input:focus-visible {
   border-color: #f04a50;
   box-shadow: 0 0 0 3px rgb(230 36 41 / 20%);
 }
-
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .filter-button {
   min-height: 40px;
   padding: 0 15px;
@@ -277,20 +247,17 @@
     background 160ms ease,
     color 160ms ease;
 }
-
 .filter-button:hover,
 .filter-button.is-active {
   border-color: #e62429;
   background: #e62429;
   color: #fff;
 }
-
 .character-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
 }
-
 .character-card {
   overflow: hidden;
   border: 1px solid #303038;
@@ -300,43 +267,34 @@
     border-color 160ms ease,
     transform 160ms ease;
 }
-
 .character-card:hover {
   transform: translateY(-4px);
   border-color: #6e3439;
 }
-
 .character-card__art {
   display: grid;
   min-height: 210px;
   place-items: center;
   background: radial-gradient(circle at 50% 40%, #633034, #292026 72%);
 }
-
 .character-card__art--ironman {
   background: radial-gradient(circle at 50% 40%, #633034, #292026 72%);
 }
-
 .character-card__art--spiderman {
   background: radial-gradient(circle at 50% 40%, #234d79, #1b202b 72%);
 }
-
 .character-card__art--strange {
   background: radial-gradient(circle at 50% 40%, #5a3e71, #24202e 72%);
 }
-
 .character-card__art--thanos {
   background: radial-gradient(circle at 50% 40%, #6b5833, #292026 72%);
 }
-
 .character-card__art--loki {
   background: radial-gradient(circle at 50% 40%, #285747, #1b202b 72%);
 }
-
 .character-card__art--doom {
   background: radial-gradient(circle at 50% 40%, #52614a, #24202e 72%);
 }
-
 .character-card__symbol {
   display: grid;
   width: 100px;
@@ -349,11 +307,9 @@
   font-weight: 900;
   letter-spacing: -1px;
 }
-
 .character-card__content {
   padding: 21px;
 }
-
 .character-card__universe {
   margin: 0 0 8px;
   color: #f04a50;
@@ -361,19 +317,16 @@
   font-weight: 800;
   letter-spacing: 1.8px;
 }
-
 .character-card h3 {
   margin: 0 0 10px;
   font-size: 22px;
 }
-
 .character-card__content > p {
   margin: 0;
   color: #b8b8c2;
   font-size: 14px;
   line-height: 1.7;
 }
-
 .character-alignment {
   display: inline-flex;
   margin-top: 16px;
@@ -383,17 +336,14 @@
   font-size: 11px;
   font-weight: 700;
 }
-
 .character-alignment--hero {
   border-color: #315b80;
   color: #91c9ff;
 }
-
 .character-alignment--villain {
   border-color: #784047;
   color: #ff9ca3;
 }
-
 .empty-state {
   padding: 40px 20px;
   border: 1px solid #303038;
@@ -401,40 +351,32 @@
   background: #19191f;
   text-align: center;
 }
-
 .empty-state h3 {
   margin-top: 0;
 }
-
 .empty-state p {
   margin-bottom: 20px;
   color: #b8b8c2;
 }
-
 .demo-notice {
   margin: 20px 0 0;
   color: #92929e;
   font-size: 12px;
   line-height: 1.6;
 }
-
 /* Página de equipos */
-
 .teams-hero {
   padding-bottom: 42px;
 }
-
 .teams-section {
   padding: 10px 0 80px;
 }
-
 .teams-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
   gap: 24px;
 }
-
 .team-card {
   min-width: 0;
   overflow: hidden;
@@ -447,13 +389,11 @@
     transform 180ms ease,
     box-shadow 180ms ease;
 }
-
 .team-card:hover {
   transform: translateY(-5px);
   border-color: #8a353b;
   box-shadow: 0 18px 38px rgb(0 0 0 / 32%);
 }
-
 .team-card__image {
   position: relative;
   display: grid;
@@ -470,7 +410,6 @@
     ),
     #17151a;
 }
-
 .team-card__image::after {
   position: absolute;
   inset: 0;
@@ -483,13 +422,11 @@
   content: "";
   pointer-events: none;
 }
-
 .team-card__image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .team-card__placeholder {
   display: grid;
   width: 100%;
@@ -504,7 +441,6 @@
     9px 9px,
     auto;
 }
-
 .team-card__placeholder span {
   position: relative;
   z-index: 1;
@@ -520,12 +456,10 @@
   text-shadow: 0 3px 18px rgb(0 0 0 / 70%);
   text-transform: uppercase;
 }
-
 .team-card__content {
   position: relative;
   padding: 22px;
 }
-
 .team-card__title {
   margin: 0 0 12px;
   color: #fff;
@@ -533,14 +467,12 @@
   font-weight: 850;
   letter-spacing: -0.6px;
 }
-
 .team-card__description {
   margin: 0 0 20px;
   color: #b8b8c2;
   font-size: 14px;
   line-height: 1.75;
 }
-
 .team-card__members {
   display: flex;
   flex-wrap: wrap;
@@ -550,7 +482,6 @@
   border-top: 1px solid #353139;
   list-style: none;
 }
-
 .team-card__members li {
   padding: 7px 10px;
   border: 1px solid #403239;
@@ -564,23 +495,19 @@
     background 160ms ease,
     color 160ms ease;
 }
-
 .team-card__members li:hover {
   border-color: #e62429;
   background: rgb(230 36 41 / 18%);
   color: #fff;
 }
-
 .about-page {
   min-height: 65vh;
   padding-top: 90px;
   padding-bottom: 90px;
 }
-
 .about-page h1 {
   margin-bottom: 26px;
 }
-
 .about-page > p:not(.eyebrow) {
   max-width: 720px;
   margin: 0 0 20px;
@@ -588,25 +515,20 @@
   font-size: 16px;
   line-height: 1.9;
 }
-
 .about-page .primary-button {
   margin-top: 12px;
 }
-
 .not-found {
   min-height: 60vh;
   padding-top: 90px;
 }
-
 .not-found h1 {
   font-size: clamp(32px, 5vw, 52px);
 }
-
 .not-found p {
   margin-bottom: 24px;
   color: #b8b8c2;
 }
-
 .site-footer {
   display: flex;
   flex-wrap: wrap;
@@ -618,27 +540,22 @@
   color: #9696a2;
   font-size: 12px;
 }
-
 .site-footer p {
   margin: 0;
 }
-
 .site-footer p:first-child {
   color: #fff;
   font-weight: 850;
   letter-spacing: 1.5px;
 }
-
 @media (max-width: 900px) {
   .teams-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
   .team-card__image {
     height: 220px;
   }
 }
-
 @media (max-width: 700px) {
   .site-header {
     align-items: flex-start;
@@ -647,86 +564,68 @@
     padding-top: 18px;
     padding-bottom: 18px;
   }
-
   .site-nav {
     flex-wrap: wrap;
     gap: 20px;
   }
-
   .page {
     width: calc(100% - 36px);
   }
-
   .hero {
     padding-top: 62px;
     padding-bottom: 54px;
   }
-
   .hero h1,
   .about-page h1 {
     letter-spacing: -1.5px;
   }
-
   .hero__description {
     font-size: 15px;
   }
-
   .character-filters {
     align-items: stretch;
     flex-direction: column;
   }
-
   .character-search {
     min-width: 0;
   }
-
   .filter-buttons {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
   .filter-button {
     padding: 0 8px;
   }
-
   .character-grid,
   .teams-grid {
     grid-template-columns: 1fr;
     gap: 18px;
   }
-
   .character-card__art {
     min-height: 180px;
   }
-
   .team-card__image {
     height: 250px;
   }
-
   .team-card__content {
     padding: 20px;
   }
-
   .team-card__title {
     font-size: 23px;
   }
-
   .section-heading {
     align-items: flex-start;
     flex-direction: column;
   }
-
   .about-page {
     padding-top: 62px;
   }
-
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
     padding: 22px 18px;
   }
 }
-
 .team-member-placeholder__art {
   display: grid;
   aspect-ratio: 1 / 1;
@@ -736,7 +635,6 @@
     radial-gradient(circle at 50% 35%, rgb(220 35 50 / 28%), transparent 45%),
     linear-gradient(145deg, #292027, #101014);
 }
-
 .team-member-placeholder__art span {
   display: grid;
   width: 112px;
@@ -750,13 +648,10 @@
   font-weight: 800;
   letter-spacing: 0.08em;
 }
-
 .team-member-placeholder .character-card__content {
   min-height: 200px;
 }
-
 /* Botón flotante para volver al inicio */
-
 .back-to-top {
   position: fixed;
   z-index: 1000;
@@ -783,24 +678,20 @@
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
-
 .back-to-top span {
   color: #ff5263;
   font-size: 1.3rem;
   line-height: 1;
 }
-
 .back-to-top:hover {
   border-color: #ff5263;
   background: #282027;
   box-shadow: 0 10px 32px rgb(255 65 80 / 18%);
 }
-
 .back-to-top:focus-visible {
   outline: 2px solid #ff5263;
   outline-offset: 4px;
 }
-
 @media (max-width: 480px) {
   .back-to-top {
     bottom: 16px;
@@ -808,11 +699,9 @@
     font-size: 0.85rem;
   }
 }
-
 /* =========================================
    MARVELTRACK - AUTENTICACIÓN
    ========================================= */
-
 .auth-page {
   width: min(100% - 36px, 1160px);
   min-height: 65vh;
@@ -823,7 +712,6 @@
   align-items: center;
   padding: 48px 0;
 }
-
 .auth-card {
   width: 100%;
   max-width: 480px;
@@ -838,20 +726,17 @@
   background: rgb(12 8 10 / 94%);
   box-shadow: 0 16px 48px rgb(0 0 0 / 35%);
 }
-
 .auth-card h1 {
   margin: 0;
   color: #fff;
   font-size: clamp(30px, 4vw, 40px);
   letter-spacing: -1px;
 }
-
 .auth-card > p:not(.eyebrow) {
   margin: 0;
   color: #c4c4cd;
   line-height: 1.7;
 }
-
 .auth-form {
   width: 100%;
   display: flex;
@@ -859,7 +744,6 @@
   align-items: stretch;
   gap: 10px;
 }
-
 .auth-form label {
   display: block;
   margin-top: 8px;
@@ -867,7 +751,6 @@
   font-size: 14px;
   font-weight: 650;
 }
-
 .auth-form input {
   display: block;
   width: 100%;
@@ -881,17 +764,14 @@
   color: #fff;
   font: inherit;
 }
-
 .auth-form input:focus {
   outline: 2px solid #e62429;
   outline-offset: 2px;
   border-color: #e62429;
 }
-
 .auth-form input[aria-invalid="true"] {
   border-color: #ff7479;
 }
-
 .auth-form .primary-button {
   width: 100%;
   min-height: 48px;
@@ -899,65 +779,53 @@
   box-sizing: border-box;
   cursor: pointer;
 }
-
 .auth-form .primary-button:disabled {
   cursor: not-allowed;
   opacity: 0.65;
 }
-
 .auth-error {
   margin: 8px 0;
   color: #ff7479;
   font-size: 14px;
   line-height: 1.6;
 }
-
 .auth-switch {
   margin: 4px 0 0;
   color: #c4c4cd;
   text-align: center;
   line-height: 1.7;
 }
-
 .auth-switch a {
   color: #ff626a;
   font-weight: 700;
 }
-
 .auth-switch a:hover {
   color: #fff;
 }
-
 @media (max-width: 600px) {
   .auth-page {
     width: calc(100% - 32px);
     min-height: 60vh;
     padding: 32px 0;
   }
-
   .auth-card {
     padding: 24px 20px;
     gap: 16px;
   }
 }
-
 .auth-field-error {
   margin: -4px 0 6px;
   color: #ff7479;
   font-size: 13px;
   line-height: 1.5;
 }
-
 .auth-form input[aria-invalid="true"] {
   border-color: #ff7479;
 }
-
 .auth-form input[aria-invalid="true"]:focus {
   outline-color: #ff7479;
 }
-
 /* Ajustes del buscador y los filtros de personajes */
-
 .characters__controls {
   display: flex;
   align-items: flex-end;
@@ -965,7 +833,6 @@
   gap: 18px 24px;
   margin-bottom: 24px;
 }
-
 .search-field {
   display: grid;
   flex: 1 1 280px;
@@ -975,7 +842,6 @@
   font-size: 12px;
   font-weight: 700;
 }
-
 .search-field input {
   width: 100%;
   min-height: 44px;
@@ -988,31 +854,25 @@
   color: #fff;
   font: inherit;
 }
-
 .search-field input:focus-visible {
   border-color: #f04a50;
   box-shadow: 0 0 0 3px rgb(230 36 41 / 20%);
 }
-
 @media (max-width: 700px) {
   .characters__controls {
     align-items: stretch;
     flex-direction: column;
     gap: 16px;
   }
-
   .search-field {
     min-width: 0;
   }
-
   .filter-buttons {
     display: flex;
     gap: 10px;
   }
 }
-
 /* Información del perfil: etiquetas y valores separados */
-
 .profile-details {
   display: flex;
   flex-direction: column;
@@ -1020,7 +880,6 @@
   width: 100%;
   margin: 28px 0;
 }
-
 .profile-details p {
   display: flex;
   flex-direction: column;
@@ -1030,14 +889,12 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-
 .profile-details strong {
   display: block;
   color: #f04a50;
   font-size: 13px;
   font-weight: 800;
 }
-
 .profile-details span {
   display: block;
   color: #f5f5f7;
@@ -1045,9 +902,7 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-
 /* Avatar del perfil */
-
 .profile-avatar {
   display: block;
   width: 96px;
@@ -1057,7 +912,6 @@
   border-radius: 50%;
   object-fit: cover;
 }
-
 .profile-avatar--placeholder {
   display: grid;
   place-items: center;
@@ -1066,18 +920,14 @@
   font-size: 36px;
   font-weight: 800;
 }
-
 /* Formulario de edición del perfil */
-
 .profile-edit-form {
   margin-top: 20px;
 }
-
 .profile-edit-form input[readonly] {
   opacity: 0.75;
   cursor: not-allowed;
 }
-
 .secondary-button {
   width: 100%;
   min-height: 42px;
@@ -1094,23 +944,19 @@
     background 0.2s ease,
     border-color 0.2s ease;
 }
-
 .secondary-button:hover:not(:disabled) {
   background: #252127;
   border-color: #e62429;
 }
-
 .secondary-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
 .auth-success {
   margin: 12px 0;
   color: #67dba0;
   font-size: 14px;
 }
-
 /* Modal de detalles del personaje */
 .character-card__open {
   display: block;
@@ -1124,7 +970,6 @@
   cursor: pointer;
   font: inherit;
 }
-
 .character-modal {
   position: fixed;
   inset: 0;
@@ -1137,7 +982,6 @@
   background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(8px);
 }
-
 .character-modal__content {
   position: relative;
   display: grid;
@@ -1153,28 +997,23 @@
   border-radius: 18px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
 }
-
 .character-modal__image {
   width: 100%;
   max-height: 480px;
   object-fit: contain;
   border-radius: 10px;
 }
-
 .character-modal__details {
   align-self: center;
 }
-
 .character-modal__details h2 {
   margin: 12px 0;
   font-size: clamp(24px, 4vw, 36px);
 }
-
 .character-modal__details > p:not(.eyebrow) {
   color: #c7c7d1;
   line-height: 1.7;
 }
-
 .character-modal__close {
   position: absolute;
   top: 10px;
@@ -1191,47 +1030,38 @@
   cursor: pointer;
   font-size: 26px;
 }
-
 .character-modal__close:hover {
   background: #b9151b;
 }
-
 @media (max-width: 600px) {
   .character-modal {
     padding: 12px;
   }
-
   .character-modal__content {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 48px 18px 22px;
   }
-
   .character-modal__image {
     max-height: 300px;
   }
 }
-
 /* ==========================================
    BOTÓN CARGAR MÁS PERSONAJES
 ========================================== */
-
 .load-more-container {
   display: flex;
   justify-content: center;
   width: 100%;
   margin: 32px 0 12px;
 }
-
 /* ==========================================
    MARVELTRACK - PÁGINA ABOUT
 ========================================== */
-
 .about-page {
   padding-top: 72px;
   padding-bottom: 80px;
 }
-
 .about-hero {
   position: relative;
   padding: 64px 48px;
@@ -1242,7 +1072,6 @@
     radial-gradient(circle at 85% 20%, rgb(230 36 41 / 22%), transparent 35%),
     linear-gradient(135deg, #21191f, #121216 75%);
 }
-
 .about-hero h1 {
   max-width: 760px;
   margin: 18px 0;
@@ -1251,7 +1080,6 @@
   line-height: 1.08;
   letter-spacing: -2px;
 }
-
 .about-hero > p:not(.eyebrow) {
   max-width: 680px;
   margin: 0 0 28px;
@@ -1259,25 +1087,21 @@
   font-size: 16px;
   line-height: 1.9;
 }
-
 .about-content {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
   margin: 34px 0;
 }
-
 .about-content > div {
   padding: 28px;
   border: 1px solid #303038;
   border-radius: 12px;
   background: linear-gradient(145deg, #1d1b21, #151519);
 }
-
 .about-content > div:last-child {
   grid-column: 1 / -1;
 }
-
 .about-content h2,
 .about-cta h2 {
   margin: 10px 0 16px;
@@ -1285,7 +1109,6 @@
   font-size: clamp(21px, 3vw, 28px);
   letter-spacing: -0.6px;
 }
-
 .about-content p:not(.eyebrow),
 .about-content li,
 .about-cta p {
@@ -1293,22 +1116,18 @@
   font-size: 14px;
   line-height: 1.85;
 }
-
 .about-content p:not(.eyebrow) {
   margin-bottom: 0;
 }
-
 .about-content ul {
   display: grid;
   gap: 12px;
   margin: 0;
   padding-left: 20px;
 }
-
 .about-content li::marker {
   color: #f04a50;
 }
-
 .about-cta {
   padding: 38px 28px;
   border: 1px solid #493038;
@@ -1318,50 +1137,39 @@
     #19151a;
   text-align: center;
 }
-
 .about-cta h2 {
   margin-top: 0;
 }
-
 .about-cta p {
   max-width: 620px;
   margin: 0 auto 24px;
 }
-
 /* Adaptación para tabletas y móviles */
-
 @media (max-width: 700px) {
   .about-page {
     padding-top: 48px;
     padding-bottom: 54px;
   }
-
   .about-hero {
     padding: 38px 24px;
   }
-
   .about-hero h1 {
     letter-spacing: -1.5px;
   }
-
   .about-hero > p:not(.eyebrow) {
     font-size: 15px;
   }
-
   .about-content {
     grid-template-columns: 1fr;
     gap: 16px;
     margin: 22px 0;
   }
-
   .about-content > div {
     padding: 23px;
   }
-
   .about-content > div:last-child {
     grid-column: auto;
   }
-
   .about-cta {
     padding: 30px 20px;
   }
