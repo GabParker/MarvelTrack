@@ -41,6 +41,7 @@ function RegisterPage() {
     const normalized = value.trim()
 
     if (!normalized) return 'Escribe tu correo electrónico.'
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
       return 'Escribe un correo electrónico válido.'
     }
@@ -50,6 +51,7 @@ function RegisterPage() {
 
   function validatePassword(value: string): string {
     if (!value) return 'Escribe una contraseña.'
+
     if (value.length < 8) {
       return 'La contraseña debe tener al menos 8 caracteres.'
     }
@@ -59,31 +61,45 @@ function RegisterPage() {
 
   function validateConfirmPassword(value: string): string {
     if (!value) return 'Confirma tu contraseña.'
-    if (value !== password) return 'Las contraseñas no coinciden.'
+
+    if (value !== password) {
+      return 'Las contraseñas no coinciden.'
+    }
 
     return ''
   }
 
+  const isFormValid =
+    !validateName(name) &&
+    !validateEmail(email) &&
+    !validatePassword(password) &&
+    !validateConfirmPassword(confirmPassword)
+
   function handleNameChange(value: string) {
     setName(value)
+
     setErrors((previous) => ({
       ...previous,
       name: validateName(value),
     }))
+
     setSubmitError('')
   }
 
   function handleEmailChange(value: string) {
     setEmail(value)
+
     setErrors((previous) => ({
       ...previous,
       email: validateEmail(value),
     }))
+
     setSubmitError('')
   }
 
   function handlePasswordChange(value: string) {
     setPassword(value)
+
     setErrors((previous) => ({
       ...previous,
       password: validatePassword(value),
@@ -91,17 +107,20 @@ function RegisterPage() {
         ? value === confirmPassword
           ? ''
           : 'Las contraseñas no coinciden.'
-        : previous.confirmPassword,
+        : '',
     }))
+
     setSubmitError('')
   }
 
   function handleConfirmPasswordChange(value: string) {
     setConfirmPassword(value)
+
     setErrors((previous) => ({
       ...previous,
-      confirmPassword: validateConfirmPassword(value),
+      confirmPassword: value ? validateConfirmPassword(value) : '',
     }))
+
     setSubmitError('')
   }
 
@@ -264,7 +283,7 @@ function RegisterPage() {
           <button
             className="primary-button"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isFormValid}
           >
             {isSubmitting ? 'Creando cuenta…' : 'Registrarme'}
           </button>

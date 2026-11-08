@@ -14,24 +14,6 @@ function getJwtSecret(): string {
   return secret
 }
 
-function getCookieOptions() {
-  const isProduction = process.env.NODE_ENV === 'production'
-
-  return {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
-    path: '/',
-  }
-}
-
-function setSessionCookie(res: Response, token: string): void {
-  res.cookie('marveltrack_token', token, {
-    ...getCookieOptions(),
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  })
-}
-
 export async function signup(req: Request, res: Response): Promise<void> {
   try {
     const { name, email, password, avatar } = req.body as {
@@ -83,7 +65,9 @@ export async function signup(req: Request, res: Response): Promise<void> {
       return
     }
 
-    const existingUser = await User.findOne({ email: normalizedEmail })
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    })
 
     if (existingUser) {
       res.status(409).json({
@@ -152,9 +136,9 @@ export async function signin(req: Request, res: Response): Promise<void> {
 
     const normalizedEmail = email.trim().toLowerCase()
 
-    const user = await User.findOne({ email: normalizedEmail }).select(
-      '+passwordHash',
-    )
+    const user = await User.findOne({
+      email: normalizedEmail,
+    }).select('+passwordHash')
 
     if (!user) {
       res.status(401).json({
@@ -181,10 +165,9 @@ export async function signin(req: Request, res: Response): Promise<void> {
       { expiresIn: '7d' },
     )
 
-    setSessionCookie(res, token)
-
     res.status(200).json({
       message: 'Inicio de sesión correcto.',
+      token,
       user: {
         id: user.id,
         name: user.name,
@@ -266,7 +249,9 @@ export async function updateCurrentUser(
 
     if (name !== undefined) {
       if (typeof name !== 'string') {
-        res.status(400).json({ message: 'El nombre debe ser texto.' })
+        res.status(400).json({
+          message: 'El nombre debe ser texto.',
+        })
         return
       }
 
@@ -327,7 +312,9 @@ export async function updateCurrentUser(
     )
 
     if (!user) {
-      res.status(404).json({ message: 'No se encontró el usuario.' })
+      res.status(404).json({
+        message: 'No se encontró el usuario.',
+      })
       return
     }
 
@@ -350,8 +337,6 @@ export async function updateCurrentUser(
 }
 
 export function signout(_req: Request, res: Response): void {
-  res.clearCookie('marveltrack_token', getCookieOptions())
-
   res.status(200).json({
     message: 'Sesión cerrada correctamente.',
   })

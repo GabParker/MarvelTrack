@@ -1,21 +1,22 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import cookieParser from 'cookie-parser'
 import { connectDatabase } from './config/database'
 import authRouter from './routes/auth.routes'
+import favoritesRouter from './routes/favorites.routes'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3001
 
-// Orígenes permitidos para el frontend de MarvelTrack.
+app.disable('x-powered-by')
+app.set('trust proxy', 1)
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   process.env.CLIENT_URL,
 ].filter((origin): origin is string => Boolean(origin))
 
-// Configuración de CORS y cookies.
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -26,22 +27,17 @@ app.use(
 
       callback(new Error('Origen no permitido por CORS.'))
     },
-    credentials: true,
   }),
 )
 
-// Middlewares para procesar solicitudes.
 app.use(express.json())
-app.use(cookieParser())
 
-// Ruta principal.
 app.get('/', (_req, res) => {
-  res.json({
+  res.status(200).json({
     message: '¡Bienvenido al servidor de MarvelTrack!',
   })
 })
 
-// Ruta para comprobar el estado del servidor.
 app.get('/api/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
@@ -49,10 +45,9 @@ app.get('/api/health', (_req, res) => {
   })
 })
 
-// Rutas de autenticación.
 app.use('/api/auth', authRouter)
+app.use('/api/favorites', favoritesRouter)
 
-// Iniciar el servidor después de conectar MongoDB.
 async function startServer(): Promise<void> {
   try {
     await connectDatabase()
@@ -65,6 +60,7 @@ async function startServer(): Promise<void> {
       'MarvelTrack no pudo iniciar porque falló la conexión con MongoDB.',
       error,
     )
+
     process.exitCode = 1
   }
 }

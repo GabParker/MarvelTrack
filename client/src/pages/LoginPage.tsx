@@ -39,24 +39,36 @@ function LoginPage() {
       return 'Escribe tu contraseña.'
     }
 
+    if (value.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres.'
+    }
+
     return ''
   }
 
+  const isFormValid =
+    !validateEmail(email) &&
+    !validatePassword(password)
+
   function handleEmailChange(value: string) {
     setEmail(value)
+
     setErrors((previous) => ({
       ...previous,
       email: validateEmail(value),
     }))
+
     setSubmitError('')
   }
 
   function handlePasswordChange(value: string) {
     setPassword(value)
+
     setErrors((previous) => ({
       ...previous,
       password: validatePassword(value),
     }))
+
     setSubmitError('')
   }
 
@@ -134,8 +146,9 @@ function LoginPage() {
             id="login-password"
             name="password"
             type="password"
-            placeholder="Introduce tu contraseña"
+            placeholder="Mínimo 8 caracteres"
             autoComplete="current-password"
+            minLength={8}
             value={password}
             onChange={(event) => handlePasswordChange(event.target.value)}
             required
@@ -164,7 +177,7 @@ function LoginPage() {
           <button
             className="primary-button"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isFormValid}
           >
             {isSubmitting ? 'Iniciando sesión…' : 'Entrar'}
           </button>
