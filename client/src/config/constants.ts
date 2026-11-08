@@ -1,3 +1,5 @@
+import type { Character } from '../types/Character'
+
 export const CHARACTERS_PER_PAGE = 24
 
 export const MARVEL_API_URL =
@@ -9,3 +11,9 @@ export const MARVEL_CHARACTER_NAMES = [
   'jean grey',
   'phoenix',
 ]
+
+export const ALIGNMENT_LABELS: Record<Character['alignment'], string> = {
+  hero: 'Héroe',
+  villain: 'Villano',
+  neutral: 'Neutral',
+}

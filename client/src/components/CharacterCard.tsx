@@ -1,21 +1,22 @@
 import type { Character } from '../types/Character'
+import { ALIGNMENT_LABELS } from '../config/constants'
 
 type CharacterCardProps = {
   character: Character
   onOpen?: (character: Character) => void
+  isFavorite?: boolean
+  isFavoriteLoading?: boolean
+  onToggleFavorite?: (character: Character) => void
 }
 
 export default function CharacterCard({
   character,
   onOpen,
+  isFavorite = false,
+  isFavoriteLoading = false,
+  onToggleFavorite,
 }: CharacterCardProps) {
-  const alignmentLabels = {
-    hero: 'Héroe',
-    villain: 'Villano',
-    neutral: 'Neutral',
-  }
-
-  const alignmentLabel = alignmentLabels[character.alignment]
+  const alignmentLabel = ALIGNMENT_LABELS[character.alignment]
 
   return (
     <article className="character-card">
@@ -54,6 +55,29 @@ export default function CharacterCard({
           </span>
         </div>
       </button>
+
+      {onToggleFavorite && (
+        <button
+          type="button"
+          className={`character-card__favorite ${
+            isFavorite ? 'is-favorite' : ''
+          }`}
+          onClick={() => onToggleFavorite(character)}
+          disabled={isFavoriteLoading}
+          aria-pressed={isFavorite}
+          aria-label={
+            isFavorite
+              ? `Quitar ${character.name} de favoritos`
+              : `Agregar ${character.name} a favoritos`
+          }
+        >
+          {isFavoriteLoading
+            ? 'Guardando…'
+            : isFavorite
+              ? '♥ En favoritos'
+              : '♡ Agregar a favoritos'}
+        </button>
+      )}
     </article>
   )
 }

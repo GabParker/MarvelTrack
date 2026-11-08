@@ -25,11 +25,20 @@ export function authMiddleware(
   next: NextFunction,
 ): void {
   const authenticatedReq = req as AuthenticatedRequest
-  const token = req.cookies?.marveltrack_token as string | undefined
+  const authorization = req.headers.authorization
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    res.status(401).json({
+      message: 'Debes iniciar sesión para acceder a este recurso.',
+    })
+    return
+  }
+
+  const token = authorization.slice(7).trim()
 
   if (!token) {
     res.status(401).json({
-      message: 'Debes iniciar sesión para acceder a este recurso.',
+      message: 'La sesión no es válida.',
     })
     return
   }

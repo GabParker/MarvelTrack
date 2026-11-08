@@ -1,6 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/useAuth'
+import {
+  getFavorites,
+  removeFavorite,
+  type Favorite,
+} from '../utils/favoritesApi'
 
 function ProfilePage() {
   const { user, logout, updateProfile } = useAuth()
@@ -15,6 +20,46 @@ function ProfilePage() {
   const [avatarError, setAvatarError] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const [favorites, setFavorites] = useState<Favorite[]>([])
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true)
+  const [favoritesError, setFavoritesError] = useState('')
+  const [removingFavoriteId, setRemovingFavoriteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadFavorites() {
+      try {
+        setIsLoadingFavorites(true)
+        setFavoritesError('')
+
+        const data = await getFavorites()
+
+        if (isMounted) {
+          setFavorites(data)
+        }
+      } catch (err) {
+        if (isMounted) {
+          setFavoritesError(
+            err instanceof Error
+              ? err.message
+              : 'No se pudieron cargar tus favoritos.',
+          )
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingFavorites(false)
+        }
+      }
+    }
+
+    loadFavorites()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   function validateName(value: string): string {
     const normalizedName = value.trim()
@@ -142,6 +187,29 @@ function ProfilePage() {
     }
   }
 
+  async function handleRemoveFavorite(favoriteId: string) {
+    setRemovingFavoriteId(favoriteId)
+    setFavoritesError('')
+
+    try {
+      await removeFavorite(favoriteId)
+
+      setFavorites((currentFavorites) =>
+        currentFavorites.filter(
+          (favorite) => favorite._id !== favoriteId,
+        ),
+      )
+    } catch (err) {
+      setFavoritesError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo eliminar el favorito.',
+      )
+    } finally {
+      setRemovingFavoriteId(null)
+    }
+  }
+
   async function handleLogout() {
     setError('')
     setSuccess('')
@@ -165,6 +233,20 @@ function ProfilePage() {
 
   const previewAvatar = avatar.trim()
   const previewName = name.trim() || user.name
+
+  const currentNameError = validateName(name)
+  const currentAvatarError = validateAvatar(avatar)
+
+  const hasChanges =
+    name.trim() !== user.name ||
+    avatar.trim() !== user.avatar
+
+  const isSaveDisabled =
+  isSaving ||
+  Boolean(nameError) ||
+  Boolean(currentNameError) ||
+  Boolean(currentAvatarError) ||
+  !hasChanges
 
   return (
     <main className="page auth-page">
@@ -215,19 +297,19 @@ function ProfilePage() {
               minLength={2}
               maxLength={40}
               required
-              aria-invalid={Boolean(nameError)}
+              aria-invalid={Boolean(currentNameError)}
               aria-describedby={
-                nameError ? 'profile-name-error' : undefined
+                currentNameError ? 'profile-name-error' : undefined
               }
             />
 
-            {nameError && (
+            {currentNameError && (
               <p
                 className="auth-field-error"
                 id="profile-name-error"
                 role="alert"
               >
-                {nameError}
+                {currentNameError}
               </p>
             )}
 
@@ -243,19 +325,19 @@ function ProfilePage() {
               placeholder="https://ejemplo.com/mi-foto.jpg"
               value={avatar}
               onChange={(event) => handleAvatarChange(event.target.value)}
-              aria-invalid={Boolean(avatarError)}
+              aria-invalid={Boolean(currentAvatarError)}
               aria-describedby={
-                avatarError ? 'profile-avatar-error' : undefined
+                currentAvatarError ? 'profile-avatar-error' : undefined
               }
             />
 
-            {avatarError && (
+            {currentAvatarError && (
               <p
                 className="auth-field-error"
                 id="profile-avatar-error"
                 role="alert"
               >
-                {avatarError}
+                {currentAvatarError}
               </p>
             )}
 
@@ -278,11 +360,7 @@ function ProfilePage() {
             <button
               className="primary-button"
               type="submit"
-              disabled={
-                isSaving ||
-                Boolean(nameError) ||
-                Boolean(avatarError)
-              }
+              disabled={isSaveDisabled}
             >
               {isSaving ? 'Guardando cambios…' : 'Guardar cambios'}
             </button>
@@ -341,6 +419,63 @@ function ProfilePage() {
         >
           {isLoggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
         </button>
+      </section>
+
+      <section className="profile-favorites">
+        <p className="eyebrow">TU COLECCIÓN PERSONAL</p>
+
+        <h2>Mis personajes favoritos</h2>
+
+        <p>Los personajes que has elegido de todo el multiverso.</p>
+
+        {isLoadingFavorites && (
+          <p role="status">Cargando tus personajes favoritos...</p>
+        )}
+
+        {favoritesError && (
+          <p className="auth-error" role="alert">
+            {favoritesError}
+          </p>
+        )}
+
+        {!isLoadingFavorites && !favoritesError && favorites.length === 0 && (
+          <div className="profile-favorites-empty">
+            <p>Aún no tienes personajes favoritos.</p>
+            <p>Explora MarvelTrack y agrega tus personajes preferidos.</p>
+          </div>
+        )}
+
+        {favorites.length > 0 && (
+          <div className="profile-favorites-grid">
+            {favorites.map((favorite) => (
+              <article
+                className="profile-favorite-card"
+                key={favorite._id}
+              >
+                <img
+                  src={favorite.image}
+                  alt={favorite.name}
+                  loading="lazy"
+                />
+
+                <div className="profile-favorite-info">
+                  <h3>{favorite.name}</h3>
+
+                  <button
+                    className="profile-favorite-remove"
+                    type="button"
+                    onClick={() => handleRemoveFavorite(favorite._id)}
+                    disabled={removingFavoriteId !== null}
+                  >
+                    {removingFavoriteId === favorite._id
+                      ? 'Eliminando...'
+                      : '♥ Quitar de favoritos'}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   )

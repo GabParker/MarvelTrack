@@ -1,13 +1,37 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Character } from '../types/Character'
 import { getMarvelCharacters } from '../utils/charactersApi'
-import { CHARACTERS_PER_PAGE } from '../config/constants'
+import {
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+} from '../utils/favoritesApi'
+import type { Favorite } from '../utils/favoritesApi'
+import {
+  ALIGNMENT_LABELS,
+  CHARACTERS_PER_PAGE,
+} from '../config/constants'
 import CharacterCard from '../components/CharacterCard'
+import { useAuth } from '../contexts/useAuth'
 
-type AlignmentFilter = 'all' | 'hero' | 'villain' | 'neutral'
+type AlignmentFilter =
+  | 'all'
+  | 'hero'
+  | 'villain'
+  | 'neutral'
+  | 'favorites'
 
 function HomePage() {
+  const { user, isLoading: isAuthLoading } = useAuth()
+
   const [characters, setCharacters] = useState<Character[]>([])
+  const [favorites, setFavorites] = useState<Favorite[]>([])
+  const [favoriteLoadingIds, setFavoriteLoadingIds] = useState<Set<number>>(
+    new Set(),
+  )
+  const [favoriteMessage, setFavoriteMessage] = useState('')
+  const [favoriteError, setFavoriteError] = useState('')
+
   const [search, setSearch] = useState('')
   const [alignment, setAlignment] = useState<AlignmentFilter>('all')
   const [visibleCount, setVisibleCount] = useState(CHARACTERS_PER_PAGE)
@@ -50,6 +74,42 @@ function HomePage() {
   }, [])
 
   useEffect(() => {
+    let isActive = true
+
+    async function loadUserFavorites() {
+      if (isAuthLoading) return
+
+      if (!user) {
+        setFavorites([])
+        return
+      }
+
+      try {
+        setFavoriteError('')
+        const data = await getFavorites()
+
+        if (isActive) {
+          setFavorites(data)
+        }
+      } catch (err) {
+        if (isActive) {
+          setFavoriteError(
+            err instanceof Error
+              ? err.message
+              : 'No se pudieron cargar tus favoritos.',
+          )
+        }
+      }
+    }
+
+    void loadUserFavorites()
+
+    return () => {
+      isActive = false
+    }
+  }, [user, isAuthLoading])
+
+  useEffect(() => {
     if (!selectedCharacter) return
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -74,11 +134,17 @@ function HomePage() {
         character.universe.toLowerCase().includes(normalizedSearch)
 
       const matchesAlignment =
-        alignment === 'all' || character.alignment === alignment
+        alignment === 'all' ||
+        (alignment === 'favorites'
+          ? Boolean(user) &&
+            favorites.some(
+              (favorite) => favorite.characterId === character.id,
+            )
+          : character.alignment === alignment)
 
       return matchesSearch && matchesAlignment
     })
-  }, [characters, search, alignment])
+  }, [characters, search, alignment, favorites, user])
 
   const visibleCharacters = filteredCharacters.slice(0, visibleCount)
 
@@ -96,13 +162,62 @@ function HomePage() {
     setVisibleCount(CHARACTERS_PER_PAGE)
   }
 
-  const hasMoreCharacters = visibleCount < filteredCharacters.length
+  async function handleToggleFavorite(character: Character) {
+    if (!user) {
+      setFavoriteError('Inicia sesión para guardar personajes favoritos.')
+      setFavoriteMessage('')
+      return
+    }
 
-  const alignmentLabels: Record<Character['alignment'], string> = {
-    hero: 'Héroe',
-    villain: 'Villano',
-    neutral: 'Neutral',
+    if (favoriteLoadingIds.has(character.id)) return
+
+    setFavoriteLoadingIds((current) => {
+      const next = new Set(current)
+      next.add(character.id)
+      return next
+    })
+
+    setFavoriteError('')
+    setFavoriteMessage('')
+
+    const existingFavorite = favorites.find(
+      (favorite) => favorite.characterId === character.id,
+    )
+
+    try {
+      if (existingFavorite) {
+        await removeFavorite(existingFavorite._id)
+
+        setFavorites((current) =>
+          current.filter(
+            (favorite) => favorite._id !== existingFavorite._id,
+          ),
+        )
+
+        setFavoriteMessage(`${character.name} se eliminó de tus favoritos.`)
+      } else {
+        const newFavorite = await addFavorite(character)
+
+        setFavorites((current) => [...current, newFavorite])
+
+        setFavoriteMessage(`${character.name} se agregó a tus favoritos.`)
+      }
+    } catch (err) {
+      setFavoriteError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo actualizar tu lista de favoritos.',
+      )
+    } finally {
+      setFavoriteLoadingIds((current) => {
+        const next = new Set(current)
+        next.delete(character.id)
+        return next
+      })
+    }
   }
+
+  const hasMoreCharacters = visibleCount < filteredCharacters.length
 
   return (
     <main className="page">
@@ -192,8 +307,33 @@ function HomePage() {
             >
               Neutrales
             </button>
+
+            <button
+              type="button"
+              className={
+                alignment === 'favorites'
+                  ? 'filter-button is-active'
+                  : 'filter-button'
+              }
+              onClick={() => handleAlignmentChange('favorites')}
+              aria-pressed={alignment === 'favorites'}
+            >
+              ♥ Favoritos
+            </button>
           </div>
         </div>
+
+        {favoriteMessage && (
+          <p className="auth-success" role="status">
+            {favoriteMessage}
+          </p>
+        )}
+
+        {favoriteError && (
+          <p className="auth-error" role="alert">
+            {favoriteError}
+          </p>
+        )}
 
         {isLoading && (
           <p className="status-message" role="status">
@@ -209,7 +349,11 @@ function HomePage() {
 
         {!isLoading && !error && filteredCharacters.length === 0 && (
           <p className="status-message">
-            No encontramos personajes con esos criterios. Prueba otra búsqueda.
+            {alignment === 'favorites'
+              ? !user
+                ? 'Inicia sesión para consultar tus personajes favoritos.'
+                : 'Todavía no tienes personajes favoritos. ¡Explora MarvelTrack y agrega algunos!'
+              : 'No encontramos personajes con esos criterios. Prueba otra búsqueda.'}
           </p>
         )}
 
@@ -221,6 +365,11 @@ function HomePage() {
                   key={character.id}
                   character={character}
                   onOpen={setSelectedCharacter}
+                  isFavorite={favorites.some(
+                    (favorite) => favorite.characterId === character.id,
+                  )}
+                  isFavoriteLoading={favoriteLoadingIds.has(character.id)}
+                  onToggleFavorite={handleToggleFavorite}
                 />
               ))}
             </div>
@@ -279,7 +428,7 @@ function HomePage() {
               <span
                 className={`character-alignment character-alignment--${selectedCharacter.alignment}`}
               >
-                {alignmentLabels[selectedCharacter.alignment]}
+                {ALIGNMENT_LABELS[selectedCharacter.alignment]}
               </span>
             </div>
           </section>

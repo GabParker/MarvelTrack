@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { AuthUser } from '../utils/authApi'
+import type { AuthUser } from '../types/User'
 
 export interface AuthContextValue {
   user: AuthUser | null
@@ -20,6 +20,6 @@ export interface AuthContextValue {
   }) => Promise<void>
 }
 
-export const AuthContext = createContext<
-  AuthContextValue | undefined
->(undefined)
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined,
+)

@@ -10,7 +10,9 @@ export async function connectDatabase(): Promise<void> {
   }
 
   try {
-    await mongoose.connect(databaseUrl)
+    await mongoose.connect(databaseUrl, {
+      maxPoolSize: 10,
+    })
 
     console.log('Conexión con MongoDB establecida correctamente.')
     console.log('Base de datos activa:', mongoose.connection.name)
