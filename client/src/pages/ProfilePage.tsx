@@ -1,0 +1,484 @@
+import { useEffect, useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/useAuth'
+import {
+  getFavorites,
+  removeFavorite,
+  type Favorite,
+} from '../utils/favoritesApi'
+
+function ProfilePage() {
+  const { user, logout, updateProfile } = useAuth()
+  const navigate = useNavigate()
+
+  const [name, setName] = useState(user?.name ?? '')
+  const [avatar, setAvatar] = useState(user?.avatar ?? '')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [nameError, setNameError] = useState('')
+  const [avatarError, setAvatarError] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const [favorites, setFavorites] = useState<Favorite[]>([])
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true)
+  const [favoritesError, setFavoritesError] = useState('')
+  const [removingFavoriteId, setRemovingFavoriteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadFavorites() {
+      try {
+        setIsLoadingFavorites(true)
+        setFavoritesError('')
+
+        const data = await getFavorites()
+
+        if (isMounted) {
+          setFavorites(data)
+        }
+      } catch (err) {
+        if (isMounted) {
+          setFavoritesError(
+            err instanceof Error
+              ? err.message
+              : 'No se pudieron cargar tus favoritos.',
+          )
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingFavorites(false)
+        }
+      }
+    }
+
+    loadFavorites()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  function validateName(value: string): string {
+    const normalizedName = value.trim()
+
+    if (!normalizedName) {
+      return 'El nombre es obligatorio.'
+    }
+
+    if (normalizedName.length < 2 || normalizedName.length > 40) {
+      return 'El nombre debe tener entre 2 y 40 caracteres.'
+    }
+
+    return ''
+  }
+
+  function validateAvatar(value: string): string {
+    const normalizedAvatar = value.trim()
+
+    if (!normalizedAvatar) {
+      return ''
+    }
+
+    try {
+      const parsedUrl = new URL(normalizedAvatar)
+
+      if (
+        !['http:', 'https:'].includes(parsedUrl.protocol) ||
+        !parsedUrl.hostname.includes('.')
+      ) {
+        return 'Introduce una URL válida que comience con https:// o http://.'
+      }
+    } catch {
+      return 'Introduce una URL válida que comience con https:// o http://.'
+    }
+
+    return ''
+  }
+
+  function handleNameChange(value: string) {
+    setName(value)
+    setNameError(validateName(value))
+    setError('')
+    setSuccess('')
+  }
+
+  function handleAvatarChange(value: string) {
+    setAvatar(value)
+    setAvatarError(validateAvatar(value))
+    setError('')
+    setSuccess('')
+  }
+
+  function handleEdit() {
+    if (!user) return
+
+    setName(user.name)
+    setAvatar(user.avatar)
+    setNameError('')
+    setAvatarError('')
+    setError('')
+    setSuccess('')
+    setIsEditing(true)
+  }
+
+  function handleCancel() {
+    if (!user) return
+
+    setName(user.name)
+    setAvatar(user.avatar)
+    setNameError('')
+    setAvatarError('')
+    setError('')
+    setSuccess('')
+    setIsEditing(false)
+  }
+
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    setError('')
+    setSuccess('')
+
+    const currentNameError = validateName(name)
+    const currentAvatarError = validateAvatar(avatar)
+
+    setNameError(currentNameError)
+    setAvatarError(currentAvatarError)
+
+    if (currentNameError || currentAvatarError) {
+      return
+    }
+
+    if (!user) return
+
+    const normalizedName = name.trim()
+    const normalizedAvatar = avatar.trim()
+
+    if (
+      normalizedName === user.name &&
+      normalizedAvatar === user.avatar
+    ) {
+      setSuccess('No hay cambios que guardar.')
+      setIsEditing(false)
+      return
+    }
+
+    setIsSaving(true)
+
+    try {
+      await updateProfile({
+        name: normalizedName,
+        avatar: normalizedAvatar,
+      })
+
+      setSuccess('Tu perfil se actualizó correctamente.')
+      setIsEditing(false)
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo actualizar tu perfil. Inténtalo de nuevo.',
+      )
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  async function handleRemoveFavorite(favoriteId: string) {
+    setRemovingFavoriteId(favoriteId)
+    setFavoritesError('')
+
+    try {
+      await removeFavorite(favoriteId)
+
+      setFavorites((currentFavorites) =>
+        currentFavorites.filter(
+          (favorite) => favorite._id !== favoriteId,
+        ),
+      )
+    } catch (err) {
+      setFavoritesError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo eliminar el favorito.',
+      )
+    } finally {
+      setRemovingFavoriteId(null)
+    }
+  }
+
+  async function handleLogout() {
+    setError('')
+    setSuccess('')
+    setIsLoggingOut(true)
+
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch {
+      setError(
+        'No se pudo cerrar la sesión en el servidor. Inténtalo de nuevo.',
+      )
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
+  if (!user) {
+    return null
+  }
+
+  const previewAvatar = avatar.trim()
+  const previewName = name.trim() || user.name
+
+  const currentNameError = validateName(name)
+  const currentAvatarError = validateAvatar(avatar)
+
+  const hasChanges =
+    name.trim() !== user.name ||
+    avatar.trim() !== user.avatar
+
+  const isSaveDisabled =
+  isSaving ||
+  Boolean(nameError) ||
+  Boolean(currentNameError) ||
+  Boolean(currentAvatarError) ||
+  !hasChanges
+
+  return (
+    <main className="page auth-page">
+      <section className="auth-card profile-card">
+        <p className="eyebrow">TU ESPACIO EN EL MULTIVERSO</p>
+
+        <h1>Mi perfil</h1>
+
+        <p>¡Bienvenido a MarvelTrack!</p>
+
+        {previewAvatar && !avatarError ? (
+          <img
+            src={previewAvatar}
+            alt={`Avatar de ${previewName}`}
+            className="profile-avatar"
+            onError={(event) => {
+              event.currentTarget.style.display = 'none'
+            }}
+            onLoad={(event) => {
+              event.currentTarget.style.display = 'block'
+            }}
+          />
+        ) : (
+          <div
+            className="profile-avatar profile-avatar--placeholder"
+            aria-label={`Inicial de ${previewName}`}
+          >
+            {previewName.charAt(0).toUpperCase()}
+          </div>
+        )}
+
+        {isEditing ? (
+          <form
+            className="auth-form profile-edit-form"
+            onSubmit={handleSave}
+            noValidate
+          >
+            <label htmlFor="profile-name">Nombre</label>
+
+            <input
+              id="profile-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              placeholder="Tu nombre"
+              value={name}
+              onChange={(event) => handleNameChange(event.target.value)}
+              minLength={2}
+              maxLength={40}
+              required
+              aria-invalid={Boolean(currentNameError)}
+              aria-describedby={
+                currentNameError ? 'profile-name-error' : undefined
+              }
+            />
+
+            {currentNameError && (
+              <p
+                className="auth-field-error"
+                id="profile-name-error"
+                role="alert"
+              >
+                {currentNameError}
+              </p>
+            )}
+
+            <label htmlFor="profile-avatar">
+              URL de la foto de perfil
+            </label>
+
+            <input
+              id="profile-avatar"
+              name="avatar"
+              type="url"
+              autoComplete="url"
+              placeholder="https://ejemplo.com/mi-foto.jpg"
+              value={avatar}
+              onChange={(event) => handleAvatarChange(event.target.value)}
+              aria-invalid={Boolean(currentAvatarError)}
+              aria-describedby={
+                currentAvatarError ? 'profile-avatar-error' : undefined
+              }
+            />
+
+            {currentAvatarError && (
+              <p
+                className="auth-field-error"
+                id="profile-avatar-error"
+                role="alert"
+              >
+                {currentAvatarError}
+              </p>
+            )}
+
+            <label htmlFor="profile-email">Correo electrónico</label>
+
+            <input
+              id="profile-email"
+              type="email"
+              value={user.email}
+              readOnly
+              aria-readonly="true"
+            />
+
+            {error && (
+              <p className="auth-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={isSaveDisabled}
+            >
+              {isSaving ? 'Guardando cambios…' : 'Guardar cambios'}
+            </button>
+
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={handleCancel}
+              disabled={isSaving}
+            >
+              Cancelar
+            </button>
+          </form>
+        ) : (
+          <>
+            <div className="profile-details">
+              <div className="profile-detail">
+                <strong>Nombre</strong>
+                <span>{user.name}</span>
+              </div>
+
+              <div className="profile-detail">
+                <strong>Correo electrónico</strong>
+                <span>{user.email}</span>
+              </div>
+            </div>
+
+            {success && (
+              <p className="auth-success" role="status">
+                {success}
+              </p>
+            )}
+
+            {error && (
+              <p className="auth-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <button
+              className="primary-button"
+              type="button"
+              onClick={handleEdit}
+              disabled={isLoggingOut}
+            >
+              Editar perfil
+            </button>
+          </>
+        )}
+
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut || isSaving}
+        >
+          {isLoggingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+        </button>
+      </section>
+
+      <section className="profile-favorites">
+        <p className="eyebrow">TU COLECCIÓN PERSONAL</p>
+
+        <h2>Mis personajes favoritos</h2>
+
+        <p>Los personajes que has elegido de todo el multiverso.</p>
+
+        {isLoadingFavorites && (
+          <p role="status">Cargando tus personajes favoritos...</p>
+        )}
+
+        {favoritesError && (
+          <p className="auth-error" role="alert">
+            {favoritesError}
+          </p>
+        )}
+
+        {!isLoadingFavorites && !favoritesError && favorites.length === 0 && (
+          <div className="profile-favorites-empty">
+            <p>Aún no tienes personajes favoritos.</p>
+            <p>Explora MarvelTrack y agrega tus personajes preferidos.</p>
+          </div>
+        )}
+
+        {favorites.length > 0 && (
+          <div className="profile-favorites-grid">
+            {favorites.map((favorite) => (
+              <article
+                className="profile-favorite-card"
+                key={favorite._id}
+              >
+                <img
+                  src={favorite.image}
+                  alt={favorite.name}
+                  loading="lazy"
+                />
+
+                <div className="profile-favorite-info">
+                  <h3>{favorite.name}</h3>
+
+                  <button
+                    className="profile-favorite-remove"
+                    type="button"
+                    onClick={() => handleRemoveFavorite(favorite._id)}
+                    disabled={removingFavoriteId !== null}
+                  >
+                    {removingFavoriteId === favorite._id
+                      ? 'Eliminando...'
+                      : '♥ Quitar de favoritos'}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
+  )
+}
+
+export default ProfilePage
