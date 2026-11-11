@@ -2,8 +2,9 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { connectDatabase } from './config/database'
-import authRouter from './routes/auth.routes'
-import favoritesRouter from './routes/favorites.routes'
+import apiRouter from './routes'
+import { notFound } from './middlewares/not-found'
+import { errorHandler } from './middlewares/error-handler'
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3001
@@ -65,25 +66,14 @@ app.get('/api/health', (_req, res) => {
   })
 })
 
-app.use('/api/auth', authRouter)
-app.use('/api/favorites', favoritesRouter)
+// Rutas centralizadas de la API.
+app.use('/api', apiRouter)
 
-app.use(
-  (
-    error: Error,
-    _req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction,
-  ) => {
-    if (error.message === 'Origen no permitido por CORS.') {
-      res.status(403).json({ message: error.message })
-      return
-    }
+// Middleware para rutas inexistentes.
+app.use(notFound)
 
-    console.error('Error interno del servidor:', error)
-    res.status(500).json({ message: 'Error interno del servidor.' })
-  },
-)
+// Middleware centralizado de errores.
+app.use(errorHandler)
 
 async function startServer(): Promise<void> {
   try {

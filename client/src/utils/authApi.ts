@@ -22,7 +22,7 @@ async function authRequest(
 ): Promise<AuthResponse> {
   const token = localStorage.getItem(TOKEN_KEY)
 
-  const headers: HeadersInit = {}
+  const headers: Record<string, string> = {}
 
   if (body) {
     headers['Content-Type'] = 'application/json'
@@ -39,6 +39,15 @@ async function authRequest(
   })
 
   const data = (await response.json()) as AuthResponse
+
+  // Eliminar el token cuando una ruta protegida rechaza la autenticación.
+  if (
+    response.status === 401 &&
+    endpoint !== '/signin' &&
+    endpoint !== '/signup'
+  ) {
+    localStorage.removeItem(TOKEN_KEY)
+  }
 
   if (!response.ok) {
     throw new Error(
