@@ -7,13 +7,14 @@ import {
   signout,
 } from '../controllers/auth.controller'
 import { authMiddleware } from '../middlewares/auth.middleware'
+import { authLimiter } from '../middlewares/auth-rate-limit'
 
 const router = Router()
 
-router.post('/signup', signup)
-router.post('/signin', signin)
+router.post('/signup', authLimiter, signup)
+router.post('/signin', authLimiter, signin)
 router.get('/me', authMiddleware, getCurrentUser)
 router.patch('/me', authMiddleware, updateCurrentUser)
-router.post('/signout', signout)
+router.post('/signout', authMiddleware, signout)
 
 export default router

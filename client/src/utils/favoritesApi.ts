@@ -37,7 +37,7 @@ async function favoritesRequest(
     throw new Error('Debes iniciar sesión para gestionar favoritos.')
   }
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${token}`,
   }
 
@@ -52,6 +52,10 @@ async function favoritesRequest(
   })
 
   const data = await response.json()
+
+  if (response.status === 401) {
+    localStorage.removeItem(TOKEN_KEY)
+  }
 
   if (!response.ok) {
     throw new Error(
@@ -85,4 +89,3 @@ export async function removeFavorite(
 ): Promise<void> {
   await favoritesRequest(`/${favoriteId}`, 'DELETE')
 }
-

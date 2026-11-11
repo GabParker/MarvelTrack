@@ -1,44 +1,4 @@
-MarvelTrack – Backend
-
-API REST de MarvelTrack, desarrollada con Node.js, Express, TypeScript y MongoDB.
-
-Este servidor administra la autenticación de usuarios, las sesiones mediante JSON Web Tokens (JWT) y la gestión de personajes favoritos.
-
-✨ Funcionalidades
-
-Registro de usuarios.
-
-Inicio de sesión.
-
-Autenticación mediante JWT.
-
-Consulta y actualización del perfil del usuario.
-
-Consulta de personajes favoritos.
-
-Registro de personajes favoritos.
-
-Eliminación de personajes favoritos.
-
-Protección de rutas privadas.
-
-Validación de datos y manejo de errores.
-
-🛠️ Tecnologías
-
-Node.js
-
-Express
-
-TypeScript
-
-MongoDB
-
-Mongoose
-
-JSON Web Token (JWT)
-
-bcrypt
+Marveltrack-api.onrender.com/api/health
 
 🚀 Instalación
 
@@ -54,13 +14,15 @@ Crea un archivo .env dentro de la carpeta server, tomando como referencia .env.e
 Configura las siguientes variables:
 
 PORT=3001
-MONGODB_URI=mongodb://127.0.0.1:27017/marveltrack
+DATABASE_URL=mongodb://127.0.0.1:27017/marveltrack
 CLIENT_URL=http://localhost:5173
 JWT_SECRET=replace_with_a_long_random_secret
 
 Reemplaza JWT_SECRET por una cadena aleatoria, larga y segura.
 
 Asegúrate de tener MongoDB instalado y en ejecución, o configura una URI de conexión a MongoDB Atlas.
+
+Importante: No compartas ni subas el archivo .env al repositorio.
 
 ▶️ Desarrollo
 
@@ -124,7 +86,7 @@ Cerrar sesión desde el cliente
 
 Favoritos – /api/favorites
 
-Todas estas rutas requieren autenticación.
+Todas estas rutas requieren autenticación mediante JWT.
 
 Método
 
@@ -150,11 +112,29 @@ DELETE
 
 Eliminar un favorito
 
+🛡️ Seguridad y manejo de errores
+
+Las contraseñas se almacenan utilizando bcrypt.
+
+Las rutas privadas requieren un token JWT válido.
+
+Los favoritos están asociados al usuario autenticado.
+
+Los endpoints de registro e inicio de sesión están protegidos mediante un límite de 10 solicitudes cada 15 minutos.
+
+Las solicitudes que superan el límite reciben una respuesta HTTP 429.
+
+El servidor cuenta con manejo centralizado de errores y respuestas JSON para rutas inexistentes.
+
 ❤️ Estado del servidor
 
 Para comprobar que el servidor funciona correctamente, visita:
 
 http://localhost:3001/api/health
+
+En producción:
+
+https://marveltrack-api.onrender.com/api/health
 
 👨‍💻 Autor
 
